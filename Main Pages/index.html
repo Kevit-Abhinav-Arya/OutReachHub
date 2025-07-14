@@ -10,7 +10,7 @@
 
 <body>
     <!-- nav-bar -->
-   <nav class="nav-style">
+  <nav class="nav-style">
         <div class="logo">
             <a href="../Main Pages/index.html"><svg class="img-fluid" id="outputsvg" xmlns="http://www.w3.org/2000/svg"
                     style="transform: matrix(1, 0, 0, 1, 0, 0); transform-origin: 50% 50% 0px; cursor: move; transition: none;"
@@ -73,13 +73,18 @@
                 </svg>
             </a>
         </div>
-        <ul class="nav-items ">
+        <ul class="nav-items " id="navigation">
             <li><a href="../Main Pages/contact.html">Contacts</a></li>
             <li><a href="#">Campaign</a></li>
             <li><a href="#">Message</a></li>
             <li><a href="../Auth Files/login.html">LOGOUT</a></li>
-            <li class="toggle"><img src="../Assets/web.png" alt="toggle" ></li>
         </ul>
+        <div class="toggle" onclick="toggleMenu()"><img src="../Assets/web.png" alt="toggle" ></div>
+         <script>
+        function toggleMenu(){
+            document.getElementById('navigation').classList.toggle('active');
+        }
+    </script>
     </nav>
     <!-- Body -->
     <center>
