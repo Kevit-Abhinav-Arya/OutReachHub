@@ -1,0 +1,112 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  background: linear-gradient(
+    135deg,
+    rgb(26, 26, 26) 0%,
+    rgb(45, 45, 45) 50%,
+    rgb(26, 26, 26) 100%
+  );
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-attachment: fixed;
+  color: #e7e0e0;
+  z-index: -100;
+}
+
+// Navbar Styling
+
+.nav-style {
+  display: flex;
+  background: linear-gradient(
+    135deg,
+    rgb(26, 26, 26) 0%,
+    rgb(45, 45, 45) 50%,
+    rgb(26, 26, 26) 100%
+  );
+  width: 100vw;
+  height: 5rem;
+  padding: 10px;
+  position: sticky;
+  top: 0;
+}
+.logo {
+  display: flex;
+  text-transform: capitalize;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 0.5rem;
+  flex: 0.2;
+
+  cursor: pointer;
+
+  svg {
+    width: 20vw;
+    height: 3vh;
+    min-width: 13.5rem;
+    mix-blend-mode: exclusion;
+    * {
+      cursor: pointer;
+    }
+  }
+}
+
+.nav-items {
+  flex: 1;
+  display: flex;
+  list-style: none;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 4rem;
+  a {
+    text-decoration: none;
+    color: rgb(240, 248, 255);
+    font-size: larger;
+    font-weight: 600;
+
+    &:hover {
+      color: rgb(82, 80, 77);
+      transition: color 0.4s ease;
+    }
+  }
+
+}
+.toggle {
+  display:none;
+
+}
+
+//Navbar breakPoints
+
+@media screen and (max-width : 900px){
+  .toggle{
+    display: block;
+    cursor: pointer;
+  }  
+  .nav-items li:not(.toggle){
+    display: none;
+  }
+  .logo{
+    svg{
+      min-width: 13.5rem;
+    }
+  }
+}
+
+@media screen and (max-width : 280px){
+  .toggle{
+    display: block;
+    cursor: pointer;
+  }  
+  .nav-items li:not(.toggle){
+    display: none;
+  }
+  .logo{
+    svg{
+      min-width: 8rem;
+    }
+  }
+}
