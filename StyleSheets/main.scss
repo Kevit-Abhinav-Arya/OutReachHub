@@ -1,15 +1,22 @@
+@import url("https://fonts.googleapis.com/css2?family=Michroma&display=swap");
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
+:root {
+  font-size: 16px;
+}
 body {
   background: linear-gradient(
     135deg,
-    rgb(26, 26, 26) 0%,
-    rgb(45, 45, 45) 50%,
-    rgb(26, 26, 26) 100%
+    rgba(12, 12, 13, 1) 0%,
+    rgba(8, 8, 8, 1) 35%,
+    rgba(42, 45, 46, 1) 100%
   );
+  font-family: Michroma;
+
   background-repeat: no-repeat;
   background-size: cover;
   background-attachment: fixed;
@@ -21,17 +28,20 @@ body {
 
 .nav-style {
   display: flex;
+
   background: linear-gradient(
     135deg,
-    rgb(26, 26, 26) 0%,
-    rgb(45, 45, 45) 50%,
-    rgb(26, 26, 26) 100%
+    rgba(12, 12, 13, 1) 0%,
+    rgba(8, 8, 8, 1) 35%,
+    rgba(42, 45, 46, 1) 100%
   );
   width: 100vw;
   height: 5rem;
   padding: 10px;
   position: sticky;
   top: 0;
+  border: 2px solid rgb(214, 210, 210);
+  border-radius: 15px;
 }
 .logo {
   display: flex;
@@ -60,12 +70,14 @@ body {
   list-style: none;
   justify-content: flex-end;
   align-items: center;
+  margin-right: 2rem;
   gap: 4rem;
   a {
     text-decoration: none;
-    color: rgb(240, 248, 255);
+    // color: rgb(240, 248, 255);
+    color: rgb(245, 73, 73);
     font-size: larger;
-    font-weight: 600;
+    font-weight: 500;
 
     &:hover {
       color: rgb(82, 80, 77);
@@ -89,8 +101,8 @@ body {
   }
   .nav-items {
     top: -3rem;
-    left: 0;
-    right: 0;
+    left: 10%;
+    right: -10%;
     position: absolute;
     display: none;
     flex-direction: column;
@@ -103,15 +115,15 @@ body {
       rgb(45, 45, 45) 50%,
       rgb(26, 26, 26) 100%
     );
-    transform: translateY(40%);
-   
+    border: 2px solid rgb(54, 54, 54);
+    border-radius: 15px;
+    transform: translateY(38%);
+
     transition: transform 0.4s ease-in-out;
   }
 
   .nav-items.active {
     display: flex;
-     
-    
   }
 
   .logo {
