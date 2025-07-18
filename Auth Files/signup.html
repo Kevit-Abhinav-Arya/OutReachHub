@@ -5,20 +5,38 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
+    <link rel="stylesheet" href="../StyleSheets/auth.css">
 </head>
 
 <body>
-    <div class="container">
-        <form action="./login.html" class="form">
+     <div class='background'>
+      
+      <div class='container'>
+        <h1> Sign Up </h1>
+        <form>
+          <input type='text' placeholder='Organization name' name='user' id='user' />
 
-            <input type="text" name="Username" id="username" placeholder="Username">
-            <input type="text" name="Organization Name" id="org_name" placeholder="Organization Name">
-            <input type="email" name="Email" id="email" placeholder="Email id">
-            <input type="password" name="Password" id="password" placeholder="Password">
+          <input type='text' placeholder='Name' name='name' id='name' />
 
-            <input type="submit" value="Sign UP">
-            <p>Already have an account? <a href="./login.html">Login</a></p>
+            <input type="text" placeholder="Organization Email-id" name=" email" id="email"/>
+            <input type="tel" placeholder="Mobile no."  name=" mob" id="mob" />
+            <input type="password" placeholder="Password" name=" pass" id="pass"/>
+            <input type="password" placeholder="Confirm Password" name=" rpass" id="rpass"/>
+
+          <div class='terms'>
+            <input type='checkbox' id='check' />
+            <label for='check'>
+              I agree to the these <a href='#'>Terms & condition</a>
+            </label>
+            
+          </div>
+          <input type='submit' value='Sign Up' class='submit' />
+          <div class='register'>
+          
+            Already have an account?<a href="./login.html">Login</a>
+          </div>
         </form>
+      </div>
     </div>
 </body>
 
