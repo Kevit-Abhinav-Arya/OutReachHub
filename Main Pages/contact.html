@@ -1,14 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contacts</title>
     <link rel="stylesheet" href="../StyleSheets/navbar.css">
+    <link rel="stylesheet" href="../StyleSheets/contact.css">
+    <link rel="stylesheet" href="../StyleSheets/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
 </head>
+
 <body>
-        <!-- Nav-Bar -->
-<nav class="nav-style">
+    <!-- Nav-Bar -->
+    <nav class="nav-style">
         <div class="logo">
             <a href="../Main Pages/index.html"><svg class="img-fluid" id="outputsvg" xmlns="http://www.w3.org/2000/svg"
                     style="transform: matrix(1, 0, 0, 1, 0, 0); transform-origin: 50% 50% 0px; cursor: move; transition: none;"
@@ -77,69 +83,441 @@
             <li><a href="#">Message</a></li>
             <li><a href="../Auth Files/login.html">LOGOUT</a></li>
         </ul>
-        <div class="toggle" onclick="toggleMenu()"><img src="../Assets/web.png" alt="toggle" ></div>
-         <script>
-        function toggleMenu(){
-            document.getElementById('navigation').classList.toggle('active');
-        }
-    </script>
+        <div class="toggle" onclick="toggleMenu()"><img src="../Assets/web.png" alt="toggle"></div>
+        <script>
+            function toggleMenu() {
+                document.getElementById('navigation').classList.toggle('active');
+            }
+        </script>
     </nav>
 
-        <!-- Heading -->
+    <!-- main container -->
 
 
-  <h1>Contacts</h1>
-  <button>+ Add New Contact</button>
+    <main class="contacts-container">
+        <!-- Header Section -->
+        <div class="contacts-header">
+            <h1>Contacts</h1>
+            <button class="add-contact-btn">
+                <i class="fas fa-plus"></i> Add Contact
+            </button>
+        </div>
 
-<section class="filters">
-  <input type="text" id="search" placeholder="Search by name or tag" />
-</section>
+        <!-- Search and Filter Section -->
+        <div class="search-filter-section">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search contacts...">
+            </div>
+            <div class="filter-box">
+                <button class="filter-btn" onclick="toggleFilter()">
+                    <i class="fas fa-filter"></i> Filter
+                </button>
+                <button class="tag-filter-btn" onclick="toggleTagFilter()">
+                    <i class="fas fa-tags"></i> Tags
+                </button>
 
-        <!-- Contacts -->
-<br><br><br><br><br><br><br><br><br><br><br>
+                <!-- Filter Dropdown -->
+                <div class="filter-dropdown" id="filterDropdown">
+                    <div class="filter-section">
+                        <h4>Sort By</h4>
+                        <div class="filter-options">
+                            <label class="filter-option">
+                                <input type="radio" name="sort" value="name-asc">
+                                <span>Name (A-Z)</span>
+                            </label>
+                            <label class="filter-option">
+                                <input type="radio" name="sort" value="name-desc">
+                                <span>Name (Z-A)</span>
+                            </label>
+                            <label class="filter-option">
+                                <input type="radio" name="sort" value="recent">
+                                <span>Recently Added</span>
+                            </label>
+                        </div>
+                    </div>
 
-<table width="70%">
-  <thead>
-    <tr >
-      <th>Name</th>
-      <th>Phone Number</th>
-      <th>Tags</th>
-      <th>Actions</th>
-    </tr>
-  </thead>
-  <tbody id="contacts-table-body">
-    <tr>
-        <td>John</td>
-        <td>123</td>
-        <td>office</td>
-        <td>
-            <button type="button">edit</button>
-            <button type="button">delete</button>
-        </td>
-    </tr>
-    <tr>
-        <td>John</td>
-        <td>123</td>
-        <td>office</td>
-        <td>
-            <button type="button">edit</button>
-            <button type="button">delete</button>
-        </td>
-    </tr>
-    <tr>
-        <td>John</td>
-        <td>123</td>
-        <td>office</td>
-        <td>
-            <button type="button">edit</button>
-            <button type="button">delete</button>
-        </td>
-    </tr>
-  </tbody>
-</table>
+                    <div class="filter-section">
+                        <h4>Status</h4>
+                        <div class="filter-options">
+                            <label class="filter-option">
+                                <input type="checkbox" name="status" value="active">
+                                <span>Active</span>
+                            </label>
+                            <label class="filter-option">
+                                <input type="checkbox" name="status" value="inactive">
+                                <span>Inactive</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="filter-actions">
+                        <button class="reset-btn">Reset</button>
+                        <button class="apply-btn">Apply Filters</button>
+                    </div>
+                </div>
+
+                <!-- Tags Filter Dropdown -->
+                <div class="filter-dropdown tags-dropdown" id="tagsDropdown">
+                    <div class="filter-section">
+                        <h4>Select Tags</h4>
+                        <div class="filter-options">
+                            <label class="filter-option">
+                                <input type="checkbox" name="tag" value="lead">
+                                <span>Lead</span>
+                            </label>
+                            <label class="filter-option">
+                                <input type="checkbox" name="tag" value="customer">
+                                <span>Customer</span>
+                            </label>
+                            <label class="filter-option">
+                                <input type="checkbox" name="tag" value="tech">
+                                <span>Tech</span>
+                            </label>
+                            <label class="filter-option">
+                                <input type="checkbox" name="tag" value="premium">
+                                <span>Premium</span>
+                            </label>
+                            <label class="filter-option">
+                                <input type="checkbox" name="tag" value="enterprise">
+                                <span>Enterprise</span>
+                            </label>
+                            <label class="filter-option">
+                                <input type="checkbox" name="tag" value="support">
+                                <span>Support</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="filter-actions">
+                        <button class="reset-btn">Clear All</button>
+                        <button class="apply-btn">Apply Tags</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contacts List -->
+        <div class="contacts-list">
+            <!-- Contact Card -->
+            <div class="contact-card">
+                <div class="contact-info">
+                    <div class="contact-avatar">JD</div>
+                    <div class="contact-details">
+                        <h3>John Doe</h3>
+                        <p>
+                            <i class="fas fa-phone"></i>
+                            1234567890
+                        </p>
+                        <p>
+                            <i class="fas fa-envelope"></i>
+                            123@gmail.com
+                        </p>
+                        <div class="contact-tags">
+                            <span class="tag">Lead</span>
+                            <span class="tag">Tech</span>
+                            <span class="tag">Enterprise</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="contact-actions">
+                    <button class="action-btn view-btn" title="View Details">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="action-btn edit-btn" title="Edit Contact">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="action-btn delete-btn" title="Delete Contact">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- More Contact Cards -->
+            <div class="contact-card">
+                <div class="contact-info">
+                    <div class="contact-avatar">JS</div>
+                    <div class="contact-details">
+                        <h3>Jane Smith</h3>
+                        <p>
+                            <i class="fas fa-phone"></i>
+                            9876543210
+                        </p>
+                        <p>
+                            <i class="fas fa-envelope"></i>
+                            abcd@gmail.com
+                        </p>
+                        <div class="contact-tags">
+                            <span class="tag">Customer</span>
+                            <span class="tag">Premium</span>
+                            <span class="tag">Support</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="contact-actions">
+                    <button class="action-btn view-btn" title="View Details">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="action-btn edit-btn" title="Edit Contact">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="action-btn delete-btn" title="Delete Contact">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+
+
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination">
+            <button class="page-btn" disabled>
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="page-btn active">1</button>
+            <button class="page-btn">2</button>
+            <button class="page-btn">3</button>
+            <span class="page-ellipsis">...</span>
+            <button class="page-btn">10</button>
+            <button class="page-btn">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+    </main>
+
+    <!-- Contact Form Modal -->
+    <div class="modal" id="contactModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add New Contact</h2>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="contactForm">
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input type="text" id="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="tel" id="phone" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email">
+                    </div>
+                    <div class="form-group">
+                        <label for="tags">Tags</label>
+                        <div class="tags-input">
+                            <div class="tags-container">
+                                <span class="tag">
+                                    Lead
+                                    <button class="remove-tag">&times;</button>
+                                </span>
+                            </div>
+                            <input type="text" id="tags" placeholder="Add tags...">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="notes">Notes</label>
+                        <textarea id="notes" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="cancel-btn">Cancel</button>
+                <button class="save-btn">Save Contact</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Contact Modal -->
+    <div class="modal-overlay" id="viewModalOverlay">
+        <div class="view-contact-modal" id="viewModal">
+            <div class="modal-header">
+                <h2>Contact Details</h2>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div class="contact-details">
+                <div class="detail-group">
+                    <label>Name</label>
+                    <div class="value">John Doe</div>
+                </div>
+                <div class="detail-group">
+                    <label>Phone Number</label>
+                    <div class="value">1234567890</div>
+                </div>
+                <div class="detail-group">
+                    <label>Email</label>
+                    <div class="value">123@gmail.com</div>
+                </div>
+                <div class="detail-group">
+                    <label>Tags</label>
+                    <div class="tags-list">
+                        <span class="tag">Lead</span>
+                        <span class="tag">Tech</span>
+                    </div>
+                </div>
+                <div class="detail-group">
+                    <label>Notes</label>
+                    <div class="value">Tech Enthusiast</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Contact Modal -->
+    <div class="modal-overlay" id="editModalOverlay">
+        <div class="edit-contact-modal" id="editModal">
+            <div class="modal-header">
+                <h2>Edit Contact</h2>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div class="edit-form">
+                <div class="form-group">
+                    <label for="editName">Name</label>
+                    <input type="text" id="editName" value="John Doe" required>
+                </div>
+                <div class="form-group">
+                    <label for="editPhone">Phone Number</label>
+                    <input type="tel" id="editPhone" value="1234567890" required>
+                </div>
+                <div class="form-group">
+                    <label for="editEmail">Email</label>
+                    <input type="email" id="editEmail" value="john.doe@example.com">
+                </div>
+                <div class="form-group">
+                    <label>Tags</label>
+                    <div class="tags-input">
+                        <div class="tags-container">
+                            <span class="tag">
+                                Lead
+                                <button class="remove-tag">&times;</button>
+                            </span>
+                            <span class="tag">
+                                Tech
+                                <button class="remove-tag">&times;</button>
+                            </span>
+                        </div>
+                        <input type="text" placeholder="Add tags...">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="editNotes">Notes</label>
+                    <textarea id="editNotes" rows="3">Tech Enthusiast</textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="cancel-btn">Cancel</button>
+                <button class="save-btn">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal-overlay" id="deleteModalOverlay">
+        <div class="delete-modal" id="deleteModal">
+            <div class="modal-header">
+                <h2>Delete Contact</h2>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <i class="fas fa-exclamation-triangle warning-icon"></i>
+                <p>Are you sure you want to delete</p>
+                <div class="contact-name">John Doe</div>
+                <p class="warning-text">This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="cancel-btn">Cancel</button>
+                <button class="delete-btn">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Contact Modal -->
+
+    <div class="modal-overlay" id="addContactModalOverlay">
+        <div class="modal add-contact-modal" id="addContactModal">
+            <div class="modal-header">
+                <h2><i class="fas fa-user-plus"></i> Add New Contact</h2>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="addContactForm" class="contact-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="firstName">First Name*</label>
+                            <input type="text" id="firstName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="lastName">Last Name*</label>
+                            <input type="text" id="lastName" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="phone">Phone Number*</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-phone"></i>
+                                <input type="tel" id="phone" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-envelope"></i>
+                                <input type="email" id="email">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="company">Company</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-building"></i>
+                            <input type="text" id="company">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Tags</label>
+                        <div class="tags-input">
+                            <div class="tags-container" id="tagsContainer">
+
+                            </div>
+                            <input type="text" id="tagInput" placeholder="Add tags and press Enter...">
+                        </div>
+
+                    </div>
+
+                    <div class="form-group">
+                        <label for="notes">Notes</label>
+                        <textarea id="notes" rows="3" placeholder="Add any additional notes..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="active" checked>
+                            <span>Set as Active Contact</span>
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="cancel-btn">Cancel</button>
+                <button class="save-btn">
+                    <i class="fas fa-save"></i> Save Contact
+                </button>
+            </div>
+        </div>
+    </div>
 
 
 
 
 </body>
+
 </html>
