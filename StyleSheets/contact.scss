@@ -1,0 +1,1415 @@
+// Variables
+$primary-gradient: linear-gradient(135deg, #0c0c0d 0%, #08080a 50%, #1a4a5e 100%);
+$card-gradient: linear-gradient(120deg, #232232 60%, #1a4a5e 100%);
+$primary-color: #64ffda;
+$secondary-color: #7fdbff;
+$accent-color: #00b4d8;
+$text-color: #e7e0e0;
+$shadow-color: rgba(26, 74, 94, 0.2);
+$transition-speed: 0.3s;
+$border-radius: 15px;
+
+// Mixins
+@mixin glass-effect {
+    background: rgba(35, 34, 50, 0.4);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba($accent-color, 0.1);
+}
+
+@mixin hover-lift {
+    transition: transform $transition-speed ease, box-shadow $transition-speed ease;
+    &:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba($accent-color, 0.2);
+    }
+}
+
+// Main Container
+.contacts-container {
+    max-width: 1400px;
+    margin: 2rem auto;
+    padding: 0 2rem;
+}
+
+// Header Section
+.contacts-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+
+    h1 {
+        color: $primary-color;
+        font-size: 2.5rem;
+        font-weight: 700;
+        text-shadow: 0 2px 10px rgba($accent-color, 0.3);
+        background: linear-gradient(90deg, $primary-color, $secondary-color);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .add-contact-btn {
+        background: linear-gradient(135deg, $primary-color 0%, $secondary-color 100%);
+        color: #232232;
+        border: none;
+        border-radius: 30px;
+        padding: 0.8rem 1.5rem;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        @include hover-lift;
+
+        i {
+            font-size: 1.1rem;
+        }
+
+        &:active {
+            transform: translateY(1px);
+        }
+    }
+}
+
+// Search and Filter Section
+.search-filter-section {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+
+    .search-box {
+        flex: 1;
+        position: relative;
+
+        i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: $text-color;
+            opacity: 0.7;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.8rem 1rem 0.8rem 2.5rem;
+            border-radius: $border-radius;
+            border: 1px solid rgba($accent-color, 0.1);
+            background: rgba(35, 34, 50, 0.4);
+            color: $text-color;
+            font-size: 1rem;
+
+            &::placeholder {
+                color: rgba($text-color, 0.5);
+            }
+
+            &:focus {
+                outline: none;
+                border-color: rgba($accent-color, 0.3);
+                box-shadow: 0 0 0 2px rgba($accent-color, 0.1);
+            }
+        }
+    }
+
+    .filter-box {
+        display: flex;
+        gap: 0.5rem;
+        position: relative;
+
+        button {
+            padding: 0.8rem 1.2rem;
+            border-radius: $border-radius;
+            border: 1px solid rgba($accent-color, 0.1);
+            background: rgba(35, 34, 50, 0.4);
+            color: $text-color;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all $transition-speed ease;
+
+            &:hover {
+                background: rgba(35, 34, 50, 0.6);
+                border-color: rgba($accent-color, 0.3);
+                color: $primary-color;
+            }
+
+            &.active {
+                background: rgba($accent-color, 0.1);
+                border-color: rgba($accent-color, 0.3);
+                color: $primary-color;
+            }
+
+            i {
+                font-size: 0.9rem;
+            }
+        }
+    }
+}
+
+// Filter Dropdown
+.filter-dropdown {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    right: 0;
+    width: 280px;
+    background: rgba(35, 34, 50, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: $border-radius;
+    border: 1px solid rgba($accent-color, 0.1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    padding: 1rem;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all $transition-speed ease;
+    z-index: 100;
+
+    &.active {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    &.tags-dropdown {
+        width: 320px;
+
+        .filter-options {
+            max-height: 200px;
+            overflow-y: auto;
+            padding-right: 0.5rem;
+
+            &::-webkit-scrollbar {
+                width: 4px;
+            }
+
+            &::-webkit-scrollbar-track {
+                background: rgba($text-color, 0.1);
+                border-radius: 2px;
+            }
+
+            &::-webkit-scrollbar-thumb {
+                background: rgba($accent-color, 0.3);
+                border-radius: 2px;
+            }
+        }
+    }
+}
+
+.filter-section {
+    &:not(:last-child) {
+        margin-bottom: 1.5rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid rgba($text-color, 0.1);
+    }
+
+    h4 {
+        color: $primary-color;
+        font-size: 1rem;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+}
+
+.filter-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.filter-option {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    cursor: pointer;
+    padding: 0.3rem;
+    border-radius: 4px;
+    transition: all $transition-speed ease;
+
+    &:hover {
+        background: rgba($accent-color, 0.1);
+    }
+
+    input[type="checkbox"],
+    input[type="radio"] {
+        appearance: none;
+        -webkit-appearance: none;
+        width: 18px;
+        height: 18px;
+        border: 2px solid rgba($accent-color, 0.3);
+        border-radius: 4px;
+        outline: none;
+        cursor: pointer;
+        position: relative;
+        transition: all $transition-speed ease;
+
+        &:checked {
+            background: $accent-color;
+            border-color: $accent-color;
+
+            &::after {
+                content: '\f00c';
+                font-family: 'Font Awesome 5 Free';
+                font-weight: 900;
+                color: #232232;
+                font-size: 0.7rem;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
+        }
+
+        &:hover {
+            border-color: $accent-color;
+        }
+    }
+
+    input[type="radio"] {
+        border-radius: 50%;
+
+        &:checked::after {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: #232232;
+            border-radius: 50%;
+        }
+    }
+
+    span {
+        color: $text-color;
+        font-size: 0.95rem;
+        user-select: none;
+    }
+}
+
+.filter-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba($text-color, 0.1);
+
+    button {
+        padding: 0.6rem 1rem;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all $transition-speed ease;
+
+        &.reset-btn {
+            background: none;
+            border: 1px solid rgba($text-color, 0.2);
+            color: $text-color;
+
+            &:hover {
+                border-color: rgba($text-color, 0.4);
+                background: rgba($text-color, 0.1);
+            }
+        }
+
+        &.apply-btn {
+            background: linear-gradient(135deg, $primary-color 0%, $secondary-color 100%);
+            border: none;
+            color: #232232;
+            font-weight: 500;
+
+            &:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 2px 8px rgba($accent-color, 0.3);
+            }
+
+            &:active {
+                transform: translateY(0);
+            }
+        }
+    }
+}
+
+// Contacts List
+.contacts-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+// Contact Card
+.contact-card {
+    @include glass-effect;
+    border-radius: $border-radius;
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    @include hover-lift;
+    transition: all $transition-speed ease;
+
+    &:hover {
+        transform: translateX(5px);
+        box-shadow: 
+            0 4px 20px rgba($accent-color, 0.2),
+            inset 0 0 20px rgba($accent-color, 0.1);
+    }
+
+    .contact-info {
+        display: flex;
+        gap: 2rem;
+        align-items: center;
+        flex: 1;
+    }
+
+    .contact-avatar {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, $primary-color 0%, $secondary-color 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.4rem;
+        font-weight: 600;
+        color: #232232;
+        box-shadow: 0 4px 15px rgba($accent-color, 0.2);
+    }
+
+    .contact-details {
+        flex: 1;
+
+        h3 {
+            color: $text-color;
+            font-size: 1.2rem;
+            margin-bottom: 0.4rem;
+            display: flex;
+            align-items: center;
+        }
+
+        p {
+            color: rgba($text-color, 0.7);
+            font-size: 1rem;
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+
+            i {
+                color: $accent-color;
+                font-size: 0.9rem;
+            }
+        }
+    }
+
+    .contact-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        max-width: 60%;
+
+        .tag {
+            background: rgba($accent-color, 0.1);
+            color: $primary-color;
+            padding: 0.3rem 1rem;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            border: 1px solid rgba($accent-color, 0.2);
+            transition: all $transition-speed ease;
+
+            &:hover {
+                background: rgba($accent-color, 0.2);
+                transform: translateY(-2px);
+                box-shadow: 0 2px 8px rgba($accent-color, 0.2);
+            }
+        }
+    }
+
+    .contact-actions {
+        display: flex;
+        gap: 1rem;
+        padding-left: 2rem;
+        border-left: 1px solid rgba($text-color, 0.1);
+
+        .action-btn {
+            background: none;
+            border: none;
+            color: $text-color;
+            opacity: 0.7;
+            cursor: pointer;
+            transition: all $transition-speed ease;
+            padding: 0.5rem;
+            font-size: 1.2rem;
+            border-radius: 8px;
+
+            &:hover {
+                opacity: 1;
+                color: $primary-color;
+                text-shadow: 0 0 20px rgba($accent-color, 0.3);
+                background: rgba($accent-color, 0.1);
+            }
+
+            &.view-btn:hover {
+                color: $secondary-color;
+            }
+
+            &.edit-btn:hover {
+                color: $primary-color;
+            }
+
+            &.delete-btn:hover {
+                color: #ff4444;
+                background: rgba(255, 68, 68, 0.1);
+            }
+        }
+    }
+}
+
+// Pagination
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 2rem;
+
+    .page-btn {
+        background: rgba(35, 34, 50, 0.4);
+        border: 1px solid rgba($accent-color, 0.1);
+        color: $text-color;
+        width: 35px;
+        height: 35px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all $transition-speed ease;
+
+        &:hover:not(:disabled) {
+            background: rgba(35, 34, 50, 0.6);
+            border-color: rgba($accent-color, 0.3);
+        }
+
+        &.active {
+            background: $primary-color;
+            color: #232232;
+            border-color: $primary-color;
+        }
+
+        &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    }
+
+    .page-ellipsis {
+        color: $text-color;
+        opacity: 0.7;
+    }
+}
+
+// Modal Styles
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+    z-index: 1000;
+
+    &.active {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+.modal-content {
+    @include glass-effect;
+    border-radius: $border-radius;
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+}
+
+.modal-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid rgba($text-color, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+
+    h2 {
+        color: $primary-color;
+        font-size: 1.5rem;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        width: 100%;
+        justify-content: center;
+
+        i {
+            font-size: 1.2rem;
+        }
+    }
+
+    .close-btn {
+        position: absolute;
+        right: 1rem;
+        top: 1rem;
+        background: none;
+        border: none;
+        color: $text-color;
+        font-size: 1.5rem;
+        cursor: pointer;
+        opacity: 0.7;
+        transition: opacity $transition-speed ease;
+        padding: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+
+        &:hover {
+            opacity: 1;
+            color: $primary-color;
+            background: rgba($text-color, 0.1);
+        }
+    }
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.modal-footer {
+    padding: 1.5rem;
+    border-top: 1px solid rgba($text-color, 0.1);
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+
+    button {
+        padding: 0.8rem 1.5rem;
+        border-radius: 8px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all $transition-speed ease;
+
+        &.cancel-btn {
+            background: rgba(35, 34, 50, 0.4);
+            border: 1px solid rgba($text-color, 0.1);
+            color: $text-color;
+
+            &:hover {
+                background: rgba(35, 34, 50, 0.6);
+            }
+        }
+
+        &.save-btn {
+            background: linear-gradient(135deg, $primary-color 0%, $secondary-color 100%);
+            border: none;
+            color: #232232;
+            font-weight: 600;
+
+            &:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba($primary-color, 0.3);
+            }
+        }
+
+        &.delete-confirm-btn {
+            background: #ff4444;
+            border: none;
+            color: white;
+            font-weight: 600;
+
+            &:hover {
+                background: #ff6666;
+            }
+        }
+    }
+}
+
+// Form Styles
+.form-group {
+    margin-bottom: 1.5rem;
+
+    label {
+        display: block;
+        color: $text-color;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+    }
+
+    input, textarea {
+        width: 100%;
+        padding: 0.8rem 1rem;
+        border-radius: 8px;
+        border: 1px solid rgba($text-color, 0.1);
+        background: rgba(35, 34, 50, 0.4);
+        color: $text-color;
+        font-size: 1rem;
+
+        &:focus {
+            outline: none;
+            border-color: rgba($accent-color, 0.3);
+            box-shadow: 0 0 0 2px rgba($accent-color, 0.1);
+        }
+    }
+}
+
+.tags-input {
+    border: 1px solid rgba($text-color, 0.1);
+    border-radius: 8px;
+    padding: 0.5rem;
+    background: rgba(35, 34, 50, 0.4);
+
+    .tags-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+
+        .tag {
+            background: rgba($accent-color, 0.1);
+            color: $primary-color;
+            padding: 0.2rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            border: 1px solid rgba($accent-color, 0.2);
+
+            .remove-tag {
+                background: none;
+                border: none;
+                color: $primary-color;
+                font-size: 1rem;
+                cursor: pointer;
+                padding: 0;
+                display: flex;
+                align-items: center;
+                opacity: 0.7;
+
+                &:hover {
+                    opacity: 1;
+                }
+            }
+        }
+    }
+
+    input {
+        border: none;
+        background: none;
+        padding: 0.3rem;
+        width: 100%;
+        color: $text-color;
+
+        &:focus {
+            outline: none;
+        }
+    }
+}
+
+// Modal Base Styles
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all $transition-speed ease;
+
+    &.active {
+        opacity: 1;
+        visibility: visible;
+    }
+}
+
+// Add Contact Modal
+.add-contact-modal {
+    @include glass-effect;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.9);
+    width: 90%;
+    max-width: 800px;
+    border-radius: $border-radius;
+    border: 1px solid rgba($accent-color, 0.1);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    visibility: hidden;
+    transition: all $transition-speed ease;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+
+    &.active {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .modal-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid rgba($text-color, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        h2 {
+            color: $primary-color;
+            font-size: 1.5rem;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+
+            i {
+                font-size: 1.2rem;
+            }
+        }
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+        overflow-y: auto;
+
+        &::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        &::-webkit-scrollbar-track {
+            background: rgba($text-color, 0.1);
+            border-radius: 3px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background: rgba($accent-color, 0.3);
+            border-radius: 3px;
+
+            &:hover {
+                background: rgba($accent-color, 0.5);
+            }
+        }
+    }
+
+    .modal-footer {
+        padding: 1.5rem;
+        border-top: 1px solid rgba($text-color, 0.1);
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+    }
+}
+
+// Form Styles
+.contact-form {
+    .form-row {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+
+        label {
+            display: block;
+            color: $text-color;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            font-size: 0.95rem;
+
+            &::after {
+                content: '*';
+                color: #ff4444;
+                margin-left: 0.3rem;
+            }
+
+            &:not([for="firstName"]):not([for="lastName"]):not([for="phone"])::after {
+                display: none;
+            }
+        }
+
+        .input-with-icon {
+            position: relative;
+
+            i {
+                position: absolute;
+                left: 1rem;
+                top: 50%;
+                transform: translateY(-50%);
+                color: rgba($text-color, 0.5);
+                font-size: 0.9rem;
+            }
+
+            input {
+                padding-left: 2.5rem;
+            }
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            border: 1px solid rgba($text-color, 0.1);
+            background: rgba(35, 34, 50, 0.4);
+            color: $text-color;
+            font-size: 1rem;
+            transition: all $transition-speed ease;
+
+            &:focus {
+                outline: none;
+                border-color: rgba($accent-color, 0.3);
+                box-shadow: 0 0 0 2px rgba($accent-color, 0.1);
+            }
+
+            &::placeholder {
+                color: rgba($text-color, 0.3);
+            }
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+    }
+
+    .checkbox-label {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        cursor: pointer;
+
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            margin: 0;
+        }
+
+        span {
+            color: $text-color;
+            font-size: 0.95rem;
+            user-select: none;
+        }
+    }
+}
+
+.suggested-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.8rem;
+
+    .suggested-tag {
+        background: rgba($accent-color, 0.1);
+        color: $text-color;
+        padding: 0.3rem 1rem;
+        border-radius: 15px;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: all $transition-speed ease;
+        border: 1px solid rgba($accent-color, 0.2);
+
+        &:hover {
+            background: rgba($accent-color, 0.2);
+            color: $primary-color;
+            transform: translateY(-1px);
+        }
+    }
+}
+
+// Modal Buttons
+.modal-footer {
+    button {
+        padding: 0.8rem 1.5rem;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: all $transition-speed ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+
+        &.cancel-btn {
+            background: none;
+            border: 1px solid rgba($text-color, 0.2);
+            color: $text-color;
+
+            &:hover {
+                border-color: rgba($text-color, 0.4);
+                background: rgba($text-color, 0.1);
+            }
+        }
+
+        &.save-btn {
+            background: linear-gradient(135deg, $primary-color 0%, $secondary-color 100%);
+            border: none;
+            color: #232232;
+            font-weight: 500;
+
+            i {
+                font-size: 0.9rem;
+            }
+
+            &:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 2px 8px rgba($accent-color, 0.3);
+            }
+
+            &:active {
+                transform: translateY(0);
+            }
+        }
+    }
+}
+
+// View Contact Modal
+.view-contact-modal {
+    @include glass-effect;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.9);
+    width: 90%;
+    max-width: 600px;
+    border-radius: $border-radius;
+    border: 1px solid rgba($accent-color, 0.1);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+    z-index: 1001;
+    opacity: 0;
+    visibility: hidden;
+    transition: all $transition-speed ease;
+
+    &.active {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .modal-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid rgba($text-color, 0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        h2 {
+            color: $primary-color;
+            font-size: 1.8rem;
+            margin: 0;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: $text-color;
+            font-size: 1.5rem;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity $transition-speed ease;
+
+            &:hover {
+                opacity: 1;
+            }
+        }
+    }
+
+    .contact-details {
+        padding: 2rem;
+
+        .detail-group {
+            margin-bottom: 1.5rem;
+
+            label {
+                display: block;
+                color: rgba($text-color, 0.7);
+                font-size: 0.9rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .value {
+                color: $text-color;
+                font-size: 1.1rem;
+            }
+
+            .tags-list {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.5rem;
+
+                .tag {
+                    background: rgba($accent-color, 0.1);
+                    color: $primary-color;
+                    padding: 0.3rem 1rem;
+                    border-radius: 15px;
+                    font-size: 0.9rem;
+                    border: 1px solid rgba($accent-color, 0.2);
+                }
+            }
+        }
+    }
+}
+
+// Edit Contact Modal
+.edit-contact-modal {
+    @include glass-effect;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.9);
+    width: 90%;
+    max-width: 600px;
+    border-radius: $border-radius;
+    border: 1px solid rgba($accent-color, 0.1);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+    z-index: 1001;
+    opacity: 0;
+    visibility: hidden;
+    transition: all $transition-speed ease;
+
+    &.active {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .modal-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid rgba($text-color, 0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        h2 {
+            color: $primary-color;
+            font-size: 1.8rem;
+            margin: 0;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: $text-color;
+            font-size: 1.5rem;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity $transition-speed ease;
+
+            &:hover {
+                opacity: 1;
+            }
+        }
+    }
+
+    .edit-form {
+        padding: 2rem;
+
+        .form-group {
+            margin-bottom: 1.5rem;
+
+            label {
+                display: block;
+                color: $text-color;
+                margin-bottom: 0.5rem;
+                font-weight: 500;
+            }
+
+            input, textarea {
+                width: 100%;
+                padding: 0.8rem 1rem;
+                border-radius: 8px;
+                border: 1px solid rgba($text-color, 0.1);
+                background: rgba(35, 34, 50, 0.4);
+                color: $text-color;
+                font-size: 1rem;
+
+                &:focus {
+                    outline: none;
+                    border-color: rgba($accent-color, 0.3);
+                    box-shadow: 0 0 0 2px rgba($accent-color, 0.1);
+                }
+            }
+        }
+
+        .tags-input {
+            border: 1px solid rgba($text-color, 0.1);
+            border-radius: 8px;
+            padding: 0.5rem;
+            background: rgba(35, 34, 50, 0.4);
+
+            .tags-container {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.5rem;
+                margin-bottom: 0.5rem;
+
+                .tag {
+                    background: rgba($accent-color, 0.1);
+                    color: $primary-color;
+                    padding: 0.2rem 0.8rem;
+                    border-radius: 15px;
+                    font-size: 0.8rem;
+                    display: flex;
+                    align-items: center;
+                    gap: 0.3rem;
+                    border: 1px solid rgba($accent-color, 0.2);
+
+                    .remove-tag {
+                        background: none;
+                        border: none;
+                        color: $primary-color;
+                        font-size: 1rem;
+                        cursor: pointer;
+                        padding: 0;
+                        display: flex;
+                        align-items: center;
+                        opacity: 0.7;
+
+                        &:hover {
+                            opacity: 1;
+                        }
+                    }
+                }
+            }
+
+            input {
+                border: none;
+                background: none;
+                padding: 0.3rem;
+                width: 100%;
+                color: $text-color;
+
+                &:focus {
+                    outline: none;
+                }
+            }
+        }
+    }
+
+    .modal-footer {
+        padding: 1.5rem;
+        border-top: 1px solid rgba($text-color, 0.1);
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+
+        button {
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all $transition-speed ease;
+
+            &.cancel-btn {
+                background: rgba(35, 34, 50, 0.4);
+                border: 1px solid rgba($text-color, 0.1);
+                color: $text-color;
+
+                &:hover {
+                    background: rgba(35, 34, 50, 0.6);
+                }
+            }
+
+            &.save-btn {
+                background: linear-gradient(135deg, $primary-color 0%, $secondary-color 100%);
+                border: none;
+                color: #232232;
+                font-weight: 600;
+
+                &:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 12px rgba($primary-color, 0.3);
+                }
+            }
+        }
+    }
+}
+
+// Delete Confirmation Modal
+.delete-modal {
+    @include glass-effect;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.9);
+    width: 90%;
+    max-width: 400px;
+    border-radius: $border-radius;
+    border: 1px solid rgba($accent-color, 0.1);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+    z-index: 1001;
+    opacity: 0;
+    visibility: hidden;
+    transition: all $transition-speed ease;
+
+    &.active {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .modal-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid rgba($text-color, 0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        h2 {
+            color: #ff4444;
+            font-size: 1.8rem;
+            margin: 0;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: $text-color;
+            font-size: 1.5rem;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity $transition-speed ease;
+
+            &:hover {
+                opacity: 1;
+            }
+        }
+    }
+
+    .modal-body {
+        padding: 2rem;
+        text-align: center;
+
+        .warning-icon {
+            font-size: 4rem;
+            color: #ff4444;
+            margin-bottom: 1rem;
+        }
+
+        p {
+            color: $text-color;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .contact-name {
+            color: $primary-color;
+            font-weight: 600;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .warning-text {
+            color: rgba($text-color, 0.7);
+            font-size: 0.9rem;
+        }
+    }
+
+    .modal-footer {
+        padding: 1.5rem;
+        border-top: 1px solid rgba($text-color, 0.1);
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+
+        button {
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all $transition-speed ease;
+            min-width: 120px;
+
+            &.cancel-btn {
+                background: rgba(35, 34, 50, 0.4);
+                border: 1px solid rgba($text-color, 0.1);
+                color: $text-color;
+
+                &:hover {
+                    background: rgba(35, 34, 50, 0.6);
+                }
+            }
+
+            &.delete-btn {
+                background: #ff4444;
+                border: none;
+                color: white;
+                font-weight: 600;
+
+                &:hover {
+                    background: #ff6666;
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 12px rgba(255, 68, 68, 0.3);
+                }
+            }
+        }
+    }
+}
+
+// Responsive Design
+@media screen and (max-width: 768px) {
+    .contacts-container {
+        padding: 0 1rem;
+    }
+
+    .search-filter-section {
+        flex-direction: column;
+    }
+
+    .contacts-list {
+        grid-template-columns: 1fr;
+    }
+
+    .contact-card {
+        flex-direction: column;
+        gap: 1rem;
+
+        .contact-actions {
+            width: 100%;
+            justify-content: flex-start;
+        }
+    }
+
+  
+}
+
+@media screen and (max-width: 480px) {
+    .contacts-header {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+
+        h1 {
+            font-size: 2rem;
+        }
+    }
+
+    .modal-content {
+        width: 95%;
+    }
+} 
