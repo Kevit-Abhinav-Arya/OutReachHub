@@ -1,10 +1,12 @@
 // @import url("https://fonts.googleapis.com/css2?family=Michroma&display=swap");
 
 // Variables
-$primary-gradient: linear-gradient(120deg, #232232 60%, #4b006e 100%);
-$primary-color: #f7caee;
+$primary-gradient: linear-gradient(120deg, #232232 60%, #1a4a5e 100%);
+$primary-color: #64ffda;
+$secondary-color: #7fdbff;
+$accent-color: #00b4d8;
 $text-color: #e7e0e0;
-$shadow-color: rgba(75, 0, 110, 0.2);
+$shadow-color: rgba(26, 74, 94, 0.2);
 $transition-speed: 0.3s;
 
 * {
@@ -15,7 +17,6 @@ $transition-speed: 0.3s;
 :root {
   font-size: 16px;
 }
-
 
 // Navbar Styling
 
@@ -29,7 +30,7 @@ $transition-speed: 0.3s;
   height: 5rem;
   padding: 1.5rem 2rem;
   position: sticky;
-  top: 1rem;
+  top: 0.2rem;
   z-index: 100;
   border-radius: 20px;
   background: transparent;
@@ -40,8 +41,9 @@ $transition-speed: 0.3s;
     background: linear-gradient(
       120deg,
       rgba(8, 8, 10, 0.8) 60%,
-      rgba(26, 27, 29, 0.8) 100%
+      rgba(26, 74, 94, 0.8) 100%
     );
+
     backdrop-filter: blur(10px);
     border: 1px solid rgba($primary-color, 0.1);
   }
@@ -73,28 +75,74 @@ $transition-speed: 0.3s;
   justify-content: flex-end;
   align-items: center;
   margin-right: 2rem;
-  gap: 2%; 
+  gap: 2%;
   li {
-    border: 0.2rem solid white;
-    border-radius: 0.7rem;
+    position: relative;
     padding: 0.5rem;
-    box-shadow: -8px 4px 5px -2px #ffffff;
+    transition: all $transition-speed ease;
+
+    &::before {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        $accent-color,
+        transparent
+      );
+      transition: width $transition-speed ease;
+    }
+
+    &:hover::before {
+      width: 100%;
+    }
 
     &:active {
-      background-color: rgb(182, 180, 176);
+      transform: translateY(2px);
     }
   }
   a {
     text-decoration: none;
-
-    color: $primary-color;
-
-    font-size: large;
+    color: rgba($text-color, 0.8);
+    font-size: 1rem;
     font-weight: 500;
+    letter-spacing: 0.5px;
+    transition: all $transition-speed ease;
+    text-shadow: 0 0 20px rgba($primary-color, 0);
 
     &:hover {
-      color: lighten($primary-color, 10%);
-      transition: color 0.4s ease;
+      color: $primary-color;
+      text-shadow: 0 0 20px rgba($accent-color, 0.3);
+      background: linear-gradient(90deg, $primary-color, $secondary-color);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    &.active {
+      color: $primary-color;
+      font-weight: 600;
+      text-shadow: 0 0 20px rgba($accent-color, 0.3);
+      background: linear-gradient(90deg, $primary-color, $secondary-color);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+
+      &::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          $accent-color,
+          transparent
+        );
+      }
     }
   }
 }
@@ -112,8 +160,7 @@ $transition-speed: 0.3s;
     align-items: center;
     cursor: pointer;
   }
-  
- 
+
   .nav-items {
     top: -3rem;
     left: 2%;
@@ -124,21 +171,39 @@ $transition-speed: 0.3s;
     align-items: center;
     padding: 1.5rem;
     gap: 1rem;
-    
 
-    background: $primary-gradient;
+    background: rgba(35, 34, 50, 0.95);
+    backdrop-filter: blur(10px);
+
+    border: 1px solid rgba($primary-color, 0.1);
     border-radius: 15px;
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.47);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.47), inset 0 0 60px $shadow-color;
 
     transform: translateY(43%);
+            transition: all $transition-speed ease;
+
     animation: nav_animation 0.2s linear;
 
-    &.active{
+    &.active {
       display: flex;
     }
-    li{
-      width: 30%;
+    li {
+      width: 100%;
       text-align: center;
+      padding: 0.8rem;
+      &::before {
+        display: none;
+      }
+
+      &:hover {
+        background: rgba($accent-color, 0.1);
+        border-radius: 8px;
+      }
+    }
+    a {
+      font-size: 1.1rem;
+      display: block;
+      width: 100%;
     }
   }
   @keyframes nav_animation {
@@ -149,8 +214,6 @@ $transition-speed: 0.3s;
       opacity: 1;
     }
   }
-
-
 
   .logo {
     svg {
