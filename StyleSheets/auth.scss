@@ -1,17 +1,19 @@
-@import url("https://fonts.googleapis.com/css2?family=Michroma&display=swap");
 
 * {
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
-  font-family: Michroma;
+  box-sizing: border-box; 
 }
 :root {
   font-size: 16px;
 }
 
+$text-color: #00b4d8;
+
+
 .background {
-  background-image: url("https://img.freepik.com/free-photo/3d-rendering-hexagonal-texture-background_23-2150796421.jpg?semt=ais_hybrid&w=740");
+  background-image: url("https://www.bombaysoftwares.com/_next/image?url=https%3A%2F%2Fbs-cms-media-prod.s3.ap-south-1.amazonaws.com%2FCloud_Computing_b1504cc53b.jpg&w=1200&q=75");
+  // background-image: url("https://www.shutterstock.com/shutterstock/videos/3560445627/thumb/1.jpg?ip=x480");
   background-size: cover;
   background-position: center;
   min-height: 100vh;
@@ -24,15 +26,16 @@
   width: 330px;
   padding: 2rem 1rem;
   margin: 10vh auto;
-  backdrop-filter: blur(20px);
+  backdrop-filter: blur(8px);
   border-radius: 10px;
-  text-align: center;
+  text-align: center; 
   box-shadow: 0 20px 35px grey;
 }
 
 h1 {
   font-size: 2rem;
-  color: rgb(245, 73, 73);
+  color: $text-color;
+;
   margin-bottom: 1.2rem;
 }
 form {
@@ -46,7 +49,7 @@ form {
     background: #e4e4e4;
 
     &:focus {
-      border: 2px solid rgb(228, 1, 1);
+      border: 2px solid rgb(5, 189, 196);
     }
   }
 }
@@ -59,7 +62,7 @@ form {
   outline: none;
   border: none;
   width: 90%;
-  background: rgb(245, 73, 73);
+  background: $text-color;
   cursor: pointer;
 
   &:hover {
@@ -70,10 +73,10 @@ form {
 .register {
   font-size: 0.9rem;
   margin-top: 1.4rem;
-  color: rgb(245, 73, 73);
+  color: $text-color;
 
   a {
-    color: rgb(255, 2, 2);
+    color: #0094d8;
     text-decoration: none;
   }
 }
@@ -86,13 +89,13 @@ form {
   a {
     text-decoration: none;
     font-size: 0.9rem;
-    color: rgb(245, 73, 73);
+    color: $text-color;
   }
 }
 
 .terms {
   margin-top: 0.2rem;
-  color: rgb(245, 73, 73);
+  color: $text-color;
 
   input {
     height: 1rem;
@@ -106,7 +109,7 @@ form {
   }
 
   a {
-    color: rgb(255, 3, 3);
+    color: $text-color;
     text-decoration: none;
   }
 }

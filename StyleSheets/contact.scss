@@ -9,10 +9,10 @@ $shadow-color: rgba(26, 74, 94, 0.2);
 $transition-speed: 0.3s;
 $border-radius: 15px;
 
-// Mixins
+// Mixins 
 @mixin glass-effect {
     background: rgba(35, 34, 50, 0.4);
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(10px);
     border: 1px solid rgba($accent-color, 0.1);
 }
@@ -168,6 +168,7 @@ $border-radius: 15px;
     z-index: 100;
 
     &.active {
+        @include glass-effect();
         opacity: 1;
         visibility: visible;
         transform: translateY(0);
