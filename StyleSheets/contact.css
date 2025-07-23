@@ -131,6 +131,10 @@
   z-index: 100;
 }
 .filter-dropdown.active {
+  background: rgba(35, 34, 50, 0.4);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 180, 216, 0.1);
   opacity: 1;
   visibility: visible;
   transform: translateY(0);
@@ -287,7 +291,7 @@
 
 .contact-card {
   background: rgba(35, 34, 50, 0.4);
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(0, 180, 216, 0.1);
   border-radius: 15px;
@@ -460,7 +464,7 @@
 
 .modal-content {
   background: rgba(35, 34, 50, 0.4);
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(0, 180, 216, 0.1);
   border-radius: 15px;
@@ -656,7 +660,7 @@
 
 .add-contact-modal {
   background: rgba(35, 34, 50, 0.4);
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(0, 180, 216, 0.1);
   position: fixed;
@@ -866,7 +870,7 @@
 
 .view-contact-modal {
   background: rgba(35, 34, 50, 0.4);
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(0, 180, 216, 0.1);
   position: fixed;
@@ -944,7 +948,7 @@
 
 .edit-contact-modal {
   background: rgba(35, 34, 50, 0.4);
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(0, 180, 216, 0.1);
   position: fixed;
@@ -1098,7 +1102,7 @@
 
 .delete-modal {
   background: rgba(35, 34, 50, 0.4);
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(0, 180, 216, 0.1);
   position: fixed;

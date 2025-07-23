@@ -1,9 +1,7 @@
-@import url("https://fonts.googleapis.com/css2?family=Michroma&display=swap");
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: Michroma;
 }
 
 :root {
@@ -11,7 +9,7 @@
 }
 
 .background {
-  background-image: url("https://img.freepik.com/free-photo/3d-rendering-hexagonal-texture-background_23-2150796421.jpg?semt=ais_hybrid&w=740");
+  background-image: url("https://www.bombaysoftwares.com/_next/image?url=https%3A%2F%2Fbs-cms-media-prod.s3.ap-south-1.amazonaws.com%2FCloud_Computing_b1504cc53b.jpg&w=1200&q=75");
   background-size: cover;
   background-position: center;
   min-height: 100vh;
@@ -24,8 +22,8 @@
   width: 330px;
   padding: 2rem 1rem;
   margin: 10vh auto;
-  -webkit-backdrop-filter: blur(20px);
-          backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(8px);
+          backdrop-filter: blur(8px);
   border-radius: 10px;
   text-align: center;
   box-shadow: 0 20px 35px grey;
@@ -33,7 +31,7 @@
 
 h1 {
   font-size: 2rem;
-  color: rgb(245, 73, 73);
+  color: #00b4d8;
   margin-bottom: 1.2rem;
 }
 
@@ -47,7 +45,7 @@ form input {
   background: #e4e4e4;
 }
 form input:focus {
-  border: 2px solid rgb(228, 1, 1);
+  border: 2px solid rgb(5, 189, 196);
 }
 
 .submit {
@@ -58,7 +56,7 @@ form input:focus {
   outline: none;
   border: none;
   width: 90%;
-  background: rgb(245, 73, 73);
+  background: #00b4d8;
   cursor: pointer;
 }
 .submit:hover {
@@ -68,10 +66,10 @@ form input:focus {
 .register {
   font-size: 0.9rem;
   margin-top: 1.4rem;
-  color: rgb(245, 73, 73);
+  color: #00b4d8;
 }
 .register a {
-  color: rgb(255, 2, 2);
+  color: #0094d8;
   text-decoration: none;
 }
 
@@ -83,12 +81,12 @@ form input:focus {
 .recover a {
   text-decoration: none;
   font-size: 0.9rem;
-  color: rgb(245, 73, 73);
+  color: #00b4d8;
 }
 
 .terms {
   margin-top: 0.2rem;
-  color: rgb(245, 73, 73);
+  color: #00b4d8;
 }
 .terms input {
   height: 1rem;
@@ -100,6 +98,6 @@ form input:focus {
   font-size: 0.9rem;
 }
 .terms a {
-  color: rgb(255, 3, 3);
+  color: #00b4d8;
   text-decoration: none;
 }/*# sourceMappingURL=auth.css.map */
