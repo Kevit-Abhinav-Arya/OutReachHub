@@ -98,8 +98,8 @@
         <!-- Header Section -->
         <div class="contacts-header">
             <h1>Contacts</h1>
-            <button class="add-contact-btn">
-                <i class="fas fa-plus"></i> Add Contact
+            <button class="add-contact-btn" ">
+                <i class=" fas fa-plus"></i> Add Contact
             </button>
         </div>
 
@@ -115,7 +115,7 @@
                 </button>
                 <button class="tag-filter-btn" onclick="toggleTagFilter()">
                     <i class="fas fa-tags"></i> Tags
-                    
+
                 </button>
 
                 <!-- Filter Dropdown -->
@@ -256,13 +256,13 @@
                     </div>
                 </div>
                 <div class="contact-actions">
-                    <button class="action-btn view-btn" title="View Details">
+                    <button class="action-btn " title="View Details">
                         <i class="fas fa-eye"></i>
                     </button>
-                    <button class="action-btn edit-btn" title="Edit Contact">
+                    <button class="action-btn" title="Edit Contact">
                         <i class="fas fa-edit"></i>
                     </button>
-                    <button class="action-btn delete-btn" title="Delete Contact">
+                    <button class="action-btn" title="Delete Contact">
                         <i class="fas fa-trash"></i>
                     </button>
                 </div>
@@ -311,7 +311,7 @@
                     <div class="form-group">
                         <label for="tags">Tags</label>
                         <div class="tags-input">
-                            <div class="tags-container">
+                            <div class="tags-container" >
                                 <span class="tag">
                                     Lead
                                     <button class="remove-tag">&times;</button>
@@ -391,7 +391,7 @@
                 <div class="form-group">
                     <label>Tags</label>
                     <div class="tags-input">
-                        <div class="tags-container">
+                        <div class="tags-container" id="editTagsContainer">
                             <span class="tag">
                                 Lead
                                 <button class="remove-tag">&times;</button>
@@ -401,7 +401,7 @@
                                 <button class="remove-tag">&times;</button>
                             </span>
                         </div>
-                        <input type="text" placeholder="Add tags...">
+                        <input type="text" id="editTagInput" placeholder="Add tags...">
                     </div>
                 </div>
                 <div class="form-group">
@@ -431,7 +431,7 @@
                 <p class="warning-text">This action cannot be undone.</p>
             </div>
             <div class="modal-footer">
-                <button class="cancel-btn">Cancel</button>
+                <button class="cancel-btn" >Cancel</button>
                 <button class="delete-btn">Delete</button>
             </div>
         </div>
@@ -443,7 +443,6 @@
         <div class="modal add-contact-modal" id="addContactModal">
             <div class="modal-header">
                 <h2><i class="fas fa-user-plus"></i> Add New Contact</h2>
-                <button class="close-btn">&times;</button>
             </div>
             <div class="modal-body">
                 <form id="addContactForm" class="contact-form">
@@ -459,6 +458,7 @@
                     </div>
 
                     <div class="form-row">
+                        <div class="form-group">
                             <label for="phone">Phone Number*</label>
                             <div class="input-with-icon">
                                 <i class="fas fa-phone"></i>
@@ -485,12 +485,18 @@
                     <div class="form-group">
                         <label>Tags</label>
                         <div class="tags-input">
-                            <div class="tags-container" id="tagsContainer">
 
+
+                            <div class="tags-container" id="tagsContainer">
                             </div>
                             <input type="text" id="tagInput" placeholder="Add tags and press Enter...">
                         </div>
-
+                        <div class="suggested-tags">
+                            <span class="suggested-tag" >Lead</span>
+                            <span class="suggested-tag" >Customer</span>
+                            <span class="suggested-tag" >Tech</span>
+                            <span class="suggested-tag">Support</span>
+                        </div>
                     </div>
 
                     <div class="form-group">
@@ -498,24 +504,22 @@
                         <textarea id="notes" rows="3" placeholder="Add any additional notes..."></textarea>
                     </div>
 
-                    <div class="form-group">
-                        <label class="checkbox-label">
-                            <input type="checkbox" id="active" checked>
-                            <span>Set as Active Contact</span>
-                        </label>
-                    </div>
+                   
                 </form>
             </div>
             <div class="modal-footer">
-                <button class="cancel-btn">Cancel</button>
-                <button class="save-btn">
+                <button class="cancel-btn" onclick="closeAddModal()">Cancel</button>
+                <button class="save-btn" onclick="saveContact()">
                     <i class="fas fa-save"></i> Save Contact
                 </button>
             </div>
         </div>
     </div>
+    </div>
 
 
+    <script src="../Scripts/contact.js"></script>
+    <script src="../Scripts/navbar.js"></script>
 
 
 </body>

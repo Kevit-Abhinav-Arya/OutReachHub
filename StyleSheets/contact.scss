@@ -11,7 +11,7 @@ $border-radius: 15px;
 
 // Mixins 
 @mixin glass-effect {
-    background: rgba(35, 34, 50, 0.4);
+    background: rgba(35, 34, 50, 0.2);
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(10px);
     border: 1px solid rgba($accent-color, 0.1);
@@ -165,7 +165,7 @@ $border-radius: 15px;
     visibility: hidden;
     transform: translateY(-10px);
     transition: all $transition-speed ease;
-    z-index: 100;
+    z-index: 1001;
 
     &.active {
         @include glass-effect();
@@ -352,7 +352,7 @@ $border-radius: 15px;
     width: 100%;
     @include hover-lift;
     transition: all $transition-speed ease;
-
+    cursor: pointer;
     &:hover {
         transform: translateX(5px);
         box-shadow: 
@@ -454,18 +454,18 @@ $border-radius: 15px;
                 background: rgba($accent-color, 0.1);
             }
 
-            &.view-btn:hover {
-                color: $secondary-color;
-            }
+            // &.view-btn:hover {
+            //     color: $secondary-color;
+            // }
 
-            &.edit-btn:hover {
-                color: $primary-color;
-            }
+            // &.edit-btn:hover {
+            //     color: $primary-color;
+            // }
 
-            &.delete-btn:hover {
-                color: #ff4444;
-                background: rgba(255, 68, 68, 0.1);
-            }
+            // &.delete-btn:hover {
+            //     color: #ff4444;
+            //     background: rgba(255, 68, 68, 0.1);
+            // }
         }
     }
 }
@@ -524,7 +524,7 @@ $border-radius: 15px;
     height: 100%;
     background: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(5px);
-    z-index: 1000;
+    z-index: 1001;
 
     &.active {
         display: flex;
@@ -679,6 +679,7 @@ $border-radius: 15px;
     border-radius: 8px;
     padding: 0.5rem;
     background: rgba(35, 34, 50, 0.4);
+    
 
     .tags-container {
         display: flex;
@@ -737,7 +738,7 @@ $border-radius: 15px;
     height: 100%;
     background: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(5px);
-    z-index: 1000;
+    z-index: 1001;
     opacity: 0;
     visibility: hidden;
     transition: all $transition-speed ease;
@@ -900,24 +901,7 @@ $border-radius: 15px;
         }
     }
 
-    .checkbox-label {
-        display: flex;
-        align-items: center;
-        gap: 0.8rem;
-        cursor: pointer;
-
-        input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            margin: 0;
-        }
-
-        span {
-            color: $text-color;
-            font-size: 0.95rem;
-            user-select: none;
-        }
-    }
+    
 }
 
 .suggested-tags {
@@ -1092,6 +1076,7 @@ $border-radius: 15px;
     opacity: 0;
     visibility: hidden;
     transition: all $transition-speed ease;
+
 
     &.active {
         transform: translate(-50%, -50%) scale(1);
