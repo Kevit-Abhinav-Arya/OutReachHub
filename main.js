@@ -38,7 +38,7 @@ let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
-    (0, common_1.Module)({
+    (0, common_1.Module)({ 
         imports: [
             typeorm_1.TypeOrmModule.forRoot({
                 type: 'sqlite',
@@ -940,6 +940,10 @@ async function bootstrap() {
         whitelist: true,
         forbidNonWhitelisted: true,
     }));
+    app.enableCors({
+        origin: "*",
+        credentials: true
+    });
     await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();

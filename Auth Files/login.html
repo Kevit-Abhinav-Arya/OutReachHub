@@ -4,15 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../StyleSheets/auth.css">
-    <script src="../Scripts/auth.js"></script>
     <title>Login</title>
 </head>
 <body> 
      <div class='background'> 
         <div class="container">
         <h1> Login </h1>
-        <!-- <form action="../Main Pages/index.html"> -->
-            <form onsubmit="handleSubmit()" action="../Main Pages/index.html">
+            <form   id="login-form"  >
             <input type="text" placeholder="UserName" name=" user" id="user" required/>
             <input type="password" placeholder="Password" name="pass" id="pass" required/>
             <div class="recover">
@@ -30,5 +28,6 @@
         </div>
     </div>
     </div>
+    <script src="../api/Routes/auth.js"></script>
 </body>
 </html>     

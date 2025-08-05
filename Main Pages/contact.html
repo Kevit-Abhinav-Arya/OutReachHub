@@ -81,7 +81,7 @@
             <li><a href="../Main Pages/contact.html">Contacts</a></li>
             <li><a href="#">Campaign</a></li>
             <li><a href="#">Message</a></li>
-            <li><a href="../Auth Files/login.html">LOGOUT</a></li>
+            <li id="logout"><a href="../Auth Files/login.html" >LOGOUT</a></li>
         </ul>
         <div class="toggle" onclick="toggleMenu()"><img src="../Assets/web.png" alt="toggle"></div>
         <script>
@@ -98,7 +98,7 @@
         <!-- Header Section -->
         <div class="contacts-header">
             <h1>Contacts</h1>
-            <button class="add-contact-btn" ">
+            <button class="add-contact-btn" data-editor-only>
                 <i class=" fas fa-plus"></i> Add Contact
             </button>
         </div>
@@ -225,10 +225,10 @@
                     <button class="action-btn view-btn" title="View Details">
                         <i class="fas fa-eye"></i>
                     </button>
-                    <button class="action-btn edit-btn" title="Edit Contact">
+                    <button class="action-btn edit-btn" title="Edit Contact" data-editor-only>
                         <i class="fas fa-edit"></i>
                     </button>
-                    <button class="action-btn delete-btn" title="Delete Contact">
+                    <button class="action-btn delete-btn" title="Delete Contact" data-editor-only>
                         <i class="fas fa-trash"></i>
                     </button>
                 </div>
@@ -259,10 +259,10 @@
                     <button class="action-btn " title="View Details">
                         <i class="fas fa-eye"></i>
                     </button>
-                    <button class="action-btn" title="Edit Contact">
+                    <button class="action-btn" title="Edit Contact" data-editor-only>
                         <i class="fas fa-edit"></i>
                     </button>
-                    <button class="action-btn" title="Delete Contact">
+                    <button class="action-btn" title="Delete Contact" data-editor-only>
                         <i class="fas fa-trash"></i>
                     </button>
                 </div>
@@ -328,7 +328,7 @@
             </div>
             <div class="modal-footer">
                 <button class="cancel-btn">Cancel</button>
-                <button class="save-btn">Save Contact</button>
+                <button class="save-btn" data-editor-only>Save Contact</button>
             </div>
         </div>
     </div>
@@ -411,7 +411,7 @@
             </div>
             <div class="modal-footer">
                 <button class="cancel-btn">Cancel</button>
-                <button class="save-btn">Save Changes</button>
+                <button class="save-btn" data-editor-only>Save Changes</button>
             </div>
         </div>
     </div>
@@ -432,7 +432,7 @@
             </div>
             <div class="modal-footer">
                 <button class="cancel-btn" >Cancel</button>
-                <button class="delete-btn">Delete</button>
+                <button class="delete-btn" data-editor-only>Delete</button>
             </div>
         </div>
     </div>
@@ -509,7 +509,7 @@
             </div>
             <div class="modal-footer">
                 <button class="cancel-btn" onclick="closeAddModal()">Cancel</button>
-                <button class="save-btn" onclick="saveContact()">
+                <button class="save-btn" onclick="saveContact()" data-editor-only>
                     <i class="fas fa-save"></i> Save Contact
                 </button>
             </div>
@@ -520,6 +520,7 @@
 
     <script src="../Scripts/contact.js"></script>
     <script src="../Scripts/navbar.js"></script>
+    <script src="../api/Routes/auth.js"></script>
 
 
 </body>
