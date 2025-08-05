@@ -8,9 +8,10 @@
     <link rel="stylesheet" href="../StyleSheets/navbar.css">
     <link rel="stylesheet" href="../StyleSheets/main.css">
     <link rel="stylesheet" href="../StyleSheets/index.css">
-    <script src="https://kit.fontawesome.com/de1c01d0f1.js" crossorigin="anonymous"></script>
+    <!-- <script src="https://kit.fontawesome.com/de1c01d0f1.js" crossorigin="anonymous"></script> -->
+         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
-    <script src="../Scripts/navbar.js"></script>
+  
 
 </head>
 
@@ -83,7 +84,7 @@
             <li><a href="../Main Pages/contact.html">Contacts</a></li>
             <li><a href="#">Campaign</a></li>
             <li><a href="#">Message</a></li>
-            <li><a href="../Auth Files/login.html">LOGOUT</a></li>
+            <li id="logout"><a href="#" >LOGOUT</a></li>
         </ul>
         <div class="toggle" onclick="toggleMenu()"><img src="../Assets/web.png" alt="toggle"></div>
 
@@ -263,6 +264,8 @@
             </div>
         </div>
     </footer>
+      <script src="../Scripts/navbar.js"></script>
+    <script src="../api/Routes/auth.js"></script>
 </body>
 
 </html>
