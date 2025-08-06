@@ -1,3 +1,4 @@
+// API Configuration
 const CONTACTS_API_BASE_URL = "http://localhost:3000";
 const CONTACT_ENDPOINTS = {
   LIST: `${CONTACTS_API_BASE_URL}/contacts`,
@@ -471,7 +472,7 @@ if (tagInput) {
   tagInput.addEventListener("keypress", function (e) {
     if (e.key === "Enter") {
       e.preventDefault();
-      const tag = this.value.trim().toLowerCase();
+      const tag = this.value.trim().toUpperCase();
       if (tag && !tags.includes(tag)) {
         addTag(tag, tagContainer);
         this.value = "";
@@ -491,7 +492,7 @@ if (suggContainer) {
   suggTag.forEach(stag => {
     stag.addEventListener("click", function (e) {
       e.preventDefault();
-      const tag = stag.textContent.toLowerCase();
+      const tag = stag.textContent.toUpperCase();
       if (!tags.includes(tag)) {
         addTag(tag, tagContainer);
       } else {
@@ -547,7 +548,7 @@ if (editTag) {
   editTag.addEventListener("keypress", function (e) {
     if (e.key === "Enter") {
       e.preventDefault();
-      const tag = this.value.trim().toLowerCase();
+      const tag = this.value.trim().toUpperCase();
       if (tag && !tags.includes(tag)) {
         tags.push(tag);
         renderEditTags();
