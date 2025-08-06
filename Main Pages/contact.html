@@ -200,10 +200,61 @@
 
         <!-- Contacts List -->
         <div class="contacts-list">
-            <!-- Contacts will be loaded dynamically via JavaScript -->
-            <div class="loading-state">
-                <i class="fas fa-spinner fa-spin" style="font-size: 24px; margin-bottom: 16px;"></i>
-                <p>Loading contacts...</p>
+        </div>
+
+        <div id="templates" style="display: none;">
+            <!-- Empty State Template -->
+            <div id="empty-state-template">
+                <div class="empty-state">
+                    <i class="fas fa-address-book" style="font-size: 48px; color: #ccc; margin-bottom: 16px;"></i>
+                    <h3>No contacts found</h3>
+                    <p>Start by adding your first contact.</p>
+                </div>
+            </div>
+
+            <!-- Contact Card Template -->
+            <div id="contact-card-template">
+                <div class="contact-card" data-contact-id="">
+                    <div class="contact-info">
+                        <div class="contact-avatar"></div>
+                        <div class="contact-details">
+                            <h3 class="contact-name"></h3>
+                            <p class="contact-phone"><i class="fas fa-phone"></i> <span></span></p>
+                            <div class="contact-tags"></div>
+                        </div>
+                    </div>
+                    <div class="contact-actions">
+                        <button class="action-btn view-btn" title="View Details">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="action-btn edit-btn" title="Edit Contact" data-editor-only>
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn delete-btn" title="Delete Contact" data-editor-only>
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading State Template -->
+            <div id="loading-state-template">
+                <div class="loading-state">
+                    <i class="fas fa-spinner fa-spin" style="font-size: 24px; margin-bottom: 16px;"></i>
+                    <p>Loading contacts...</p>
+                </div>
+            </div>
+
+     
+
+            <!-- Authentication Required Template -->
+            <div id="auth-required-template">
+                <div class="error-state">
+                    <i class="fas fa-exclamation-circle" style="font-size: 48px; color: #dc3545; margin-bottom: 16px;"></i>
+                    <h3>Authentication required</h3>
+                    <p>Please login to view contacts.</p>
+                    <button class="btn btn-primary" onclick="window.location.href='../Auth Files/login.html'">Login</button>
+                </div>
             </div>
         </div>
 
@@ -279,11 +330,11 @@
             <div class="contact-details">
                 <div class="detail-group">
                     <label>Name</label>
-                    <div class="value">John Doe</div>
+                    <div class="value"></div>
                 </div>
                 <div class="detail-group">
                     <label>Phone Number</label>
-                    <div class="value">1234567890</div>
+                    <div class="value"></div>
                 </div>
                 <div class="detail-group">
                     <label>Email</label>
@@ -292,8 +343,8 @@
                 <div class="detail-group">
                     <label>Tags</label>
                     <div class="tags-list">
-                        <span class="tag">Lead</span>
-                        <span class="tag">Tech</span>
+                        <span class="tag"></span>
+                        
                     </div>
                 </div>
                 <div class="detail-group">
