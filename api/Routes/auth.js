@@ -271,7 +271,7 @@ function showNotification(message, type = "info") {
 // Role-based UI 
 function setupRoleBasedUI() {
   const userRole = AuthUtils.getUserRole();
-  console.log("Setting up UI for role:", userRole);
+  console.log("Setting UI for", userRole);
   
   if (!userRole) {
     console.log("No user role found");
@@ -329,7 +329,7 @@ function addRoleIndicator(role) {
 }
 
 function applyRoleBasedRestrictions(role) {
-  console.log("Applying restrictions for role:", role);
+  console.log("UI for:", role);
   
   if (role === 'viewer') {
     hideElementsForViewer();
@@ -349,7 +349,6 @@ function hideElementsForViewer() {
     const elements = document.querySelectorAll(selector);
     elements.forEach(element => {
       element.style.display = 'none';
-      console.log("Hidden element:", selector);
     });
   });
 
