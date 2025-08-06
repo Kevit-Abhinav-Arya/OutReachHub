@@ -1,3 +1,4 @@
+// API Configuration
 const CONTACTS_API_BASE_URL = "http://localhost:3000";
 const CONTACT_ENDPOINTS = {
   LIST: `${CONTACTS_API_BASE_URL}/contacts`,
