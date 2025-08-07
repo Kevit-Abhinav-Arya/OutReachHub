@@ -764,6 +764,7 @@
   border: 1px solid rgba(231, 224, 224, 0.1);
   background: rgba(35, 34, 50, 0.4);
   color: #e7e0e0;
+  text-transform: capitalize;
   font-size: 1rem;
   transition: all 0.3s ease;
 }
