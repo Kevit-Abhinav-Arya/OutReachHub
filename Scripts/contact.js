@@ -192,17 +192,16 @@ const ContactService = {
 // Display Contacts
 //--------------------------------------------------------------------------------
 
-async function loadContacts(options = {}) {
+async function loadContacts() {
   try {
     showLoadingState();
     
     const response = await ContactService.getAllContacts({
       page: currentPage,
       limit: 10,
-      ...options
     });
     
-    const { data: contacts, total, page, limit, totalPages: tp } = response;
+    const { data: contacts,page , totalPages: tp } = response;
     currentContacts = contacts;
     totalPages = tp;
     currentPage = page;
@@ -287,11 +286,11 @@ async function viewContact(contactId) {
   try {
     const contact = await ContactService.getContactById(contactId);
     
-    // Update view modal with contact data
+    // Updating the view modal with contact data
     document.querySelector('#viewModal .detail-group:nth-child(1) .value').textContent = contact.name;
     document.querySelector('#viewModal .detail-group:nth-child(2) .value').textContent = ContactUtils.formatPhoneNumber(contact.phoneNumber);
     
-    // Update tags
+    // Updating tags
     const tagsContainer = document.querySelector('#viewModal .tags-list');
     if (contact.tags && contact.tags.length > 0) {
       tagsContainer.innerHTML = contact.tags.map(tag => 

@@ -2,17 +2,19 @@ const mongoose = require("mongoose");
 
 const campaignMessageSchema = mongoose.Schema({
     
+  
   _id: mongoose.Schema.Types.ObjectId,
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-  name: { type: String, required: true },
-  workspaces: [ 
-    {
-      workspaceId: { type: mongoose.Schema.Types.ObjectId, ref: 'Workspace', required: true },
-      role: { type: String, enum: ['Editor', 'Viewer'], required: true }
-    }
-  ],
-  createdAt: { type: Date, default: Date.now }
+  workspaceId: { type: mongoose.Schema.Types.ObjectId, ref: 'Workspace', required: true, index: true },
+  campaignId: { type: mongoose.Schema.Types.ObjectId, ref: 'Campaigns', required: true, index: true },
+  contactId: { type: mongoose.Schema.Types.ObjectId, ref: 'Contact' },
+
+  contactPhoneNumber: { type: String, required: true },
+  messageBody: { type: String, required: true },
+  messageImageUrl: { type: String },
+
+  status: { type: String, enum: ['Sent', 'Failed'], required: true },
+  sentAt: { type: Date, default: Date.now }
+
 
 });
 

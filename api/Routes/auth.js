@@ -4,6 +4,8 @@ const AUTH_ENDPOINTS = {
   LOGOUT: `${API_BASE_URL}/auth/logout`,
 };
 
+
+
 const AuthUtils = {
   getToken: () => {
     return localStorage.getItem("access_token");
@@ -49,6 +51,7 @@ const AuthUtils = {
     return false;
   }
 };
+
 
 // Login Logic
 const loginForm = document.querySelector("#login-form");
@@ -278,55 +281,11 @@ function setupRoleBasedUI() {
     return;
   }
 
-  addRoleIndicator(userRole);
   
   applyRoleBasedRestrictions(userRole);
 }
 
-function addRoleIndicator(role) {
 
-  const navigation = document.getElementById('navigation');
-  if (!navigation) return;
-
-  const existingIndicator = document.getElementById('role-indicator');
-  if (existingIndicator) {
-    existingIndicator.remove();
-  }
-
-  const roleIndicator = document.createElement('li');
-  roleIndicator.id = 'role-indicator';
-  roleIndicator.innerHTML = `<span class="role-badge">${role.toUpperCase()}</span>`;
-  
-  const roleStyles = document.createElement('style');
-  roleStyles.textContent = `
-    .role-badge {
-      background: ${role === 'editor' ? '#10B981' : '#3B82F6'};
-      color: white;
-      padding: 4px 8px;
-      border-radius: 12px;
-      font-size: 10px;
-      font-weight: bold;
-      text-transform: uppercase;
-      display: inline-block;
-    }
-    .nav-style #role-indicator {
-      margin-right: 10px;
-    }
-    @media (max-width: 768px) {
-      .nav-style #role-indicator {
-        margin: 5px 0;
-      }
-    }
-  `;
-  document.head.appendChild(roleStyles);
-
-  const logoutElement = navigation.querySelector('#logout');
-  if (logoutElement) {
-    navigation.insertBefore(roleIndicator, logoutElement);
-  } else {
-    navigation.appendChild(roleIndicator);
-  }
-}
 
 function applyRoleBasedRestrictions(role) {
   console.log("UI for:", role);
@@ -340,17 +299,11 @@ function applyRoleBasedRestrictions(role) {
 }
 
 function hideElementsForViewer() {
-  const elementsToHide = [
-                      
-    '[data-editor-only]'          
-  ];
 
-  elementsToHide.forEach(selector => {
-    const elements = document.querySelectorAll(selector);
-    elements.forEach(element => {
-      element.style.display = 'none';
-    });
-  });
+  const elementsToHide = document.querySelectorAll('[data-editor-only]');
+  elementsToHide.forEach(elements => {
+    elements.style.display = 'none';
+  })
 
 
 }
@@ -390,6 +343,4 @@ function showElementsForEditor() {
 
 
 }
-
-
 

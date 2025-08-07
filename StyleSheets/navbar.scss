@@ -146,6 +146,23 @@ $transition-speed: 0.3s;
 .toggle {
   display: none;
 }
+.role-badge {
+      color: white;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 10px;
+      font-weight: bold;
+      text-transform: uppercase;
+      display: inline-block;
+    }
+    .nav-style #role-indicator {
+      margin-right: 10px;
+    }
+    @media (max-width: 768px) {
+      .nav-style #role-indicator {
+        margin: 5px 0;
+      }
+    }
 
 //Navbar breakPoints
 
