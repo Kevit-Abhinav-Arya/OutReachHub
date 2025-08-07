@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const { Unique } = require("typeorm");
 
 const contactSchema = mongoose.Schema({
 
@@ -14,5 +13,9 @@ const contactSchema = mongoose.Schema({
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now }
 });
+
+contactSchema.index({ workspaceId: 1, phoneNumber: 1 }, { unique: true });
+contactSchema.index({ workspaceId: 1, tags: 1 });
+contactSchema.index({ workspaceId: 1, createdAt: -1 });
 
 module.exports = mongoose.model('Contacts',contactSchema);

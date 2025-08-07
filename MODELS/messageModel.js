@@ -14,5 +14,6 @@ const messageSchema = mongoose.Schema({
     createdAt: { type: Date, default: Date.now }
     
 });
+messageSchema.index({ workspaceId: 1 });
 
 module.exports = mongoose.model('Message',messageSchema);

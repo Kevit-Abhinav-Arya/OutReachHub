@@ -236,7 +236,7 @@ function renderContactsList(contacts) {
     
     contactCard.setAttribute('data-contact-id', contact.id);
     contactCard.querySelector('.contact-avatar').textContent = getInitials(contact.name);
-    contactCard.querySelector('.contact-name').textContent = contact.name;
+    contactCard.querySelector('.contact-name').textContent = contact.name.toUpperCase();
     contactCard.querySelector('.contact-phone span').textContent = ContactUtils.formatPhoneNumber(contact.phoneNumber);
     
     // Handle tags
@@ -287,7 +287,7 @@ async function viewContact(contactId) {
     const contact = await ContactService.getContactById(contactId);
     
     // Updating the view modal with contact data
-    document.querySelector('#viewModal .detail-group:nth-child(1) .value').textContent = contact.name;
+    document.querySelector('#viewModal .detail-group:nth-child(1) .value').textContent = contact.name.toUpperCase();
     document.querySelector('#viewModal .detail-group:nth-child(2) .value').textContent = ContactUtils.formatPhoneNumber(contact.phoneNumber);
     
     // Updating tags

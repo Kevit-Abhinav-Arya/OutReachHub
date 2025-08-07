@@ -6,7 +6,7 @@ const campaignMessageSchema = mongoose.Schema({
   _id: mongoose.Schema.Types.ObjectId,
   workspaceId: { type: mongoose.Schema.Types.ObjectId, ref: 'Workspace', required: true, index: true },
   campaignId: { type: mongoose.Schema.Types.ObjectId, ref: 'Campaigns', required: true, index: true },
-  contactId: { type: mongoose.Schema.Types.ObjectId, ref: 'Contact' },
+  contactId: { type: mongoose.Schema.Types.ObjectId, ref: 'Contacts' },
 
   contactPhoneNumber: { type: String, required: true },
   messageBody: { type: String, required: true },
@@ -17,5 +17,9 @@ const campaignMessageSchema = mongoose.Schema({
 
 
 });
+
+campaignMessageSchema.index({ campaignId: 1 });
+campaignMessageSchema.index({ workspaceId: 1, sentAt: -1 });
+campaignMessageSchema.index({ workspaceId: 1, contactId: 1 });
 
 module.exports = mongoose.model('CampaignMessage',campaignMessageSchema);
