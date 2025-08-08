@@ -375,3 +375,60 @@ const contactQueries = {
     .exec();
   }
 };
+
+//Message template MOdule
+const messageQueries = {
+  listMessages: async (workspaceId, page = 1, limit = 10, typeFilter = null) => {
+    const skip = (page - 1) * limit;
+    let query = { workspaceId };
+    
+    if (typeFilter) {
+      query.type = typeFilter;
+    }
+
+    return await Message.find(query)
+      .populate('createdBy', 'name email')
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .exec();
+  },
+
+  getMessagesCount: async (workspaceId, typeFilter = null) => {
+    let query = { workspaceId };
+    if (typeFilter) {
+      query.type = typeFilter;
+    }
+    return await Message.countDocuments(query);
+  },
+
+  createMessage: async (messageData) => {
+    const message = new Message({
+      _id: new mongoose.Types.ObjectId(),
+      ...messageData
+    });
+    return await message.save();
+  },
+
+  getMessageById: async (messageId, workspaceId) => {
+    return await Message.findOne({
+      _id: messageId,
+      workspaceId
+    }).populate('createdBy', 'name email');
+  },
+
+  updateMessage: async (messageId, workspaceId, updateData) => {
+    return await Message.findOneAndUpdate(
+      { _id: messageId, workspaceId },
+      updateData,
+      { new: true }
+    );
+  },
+
+  deleteMessage: async (messageId, workspaceId) => {
+    return await Message.findOneAndDelete({
+      _id: messageId,
+      workspaceId
+    });
+  }
+};
