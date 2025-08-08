@@ -291,3 +291,87 @@ const analyticsQueries = {
     ]);
   }
 };
+//contacts module
+const contactQueries = {
+  listContacts: async (workspaceId, page = 1, limit = 10, tagFilter = null) => {
+    const skip = (page - 1) * limit;
+    let query = { workspaceId };
+    
+    if (tagFilter) {
+      query.tags = { $in: [tagFilter] };
+    }
+
+    return await Contact.find(query)
+      .populate('createdBy', 'name email')
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .exec();
+  },
+
+ 
+
+  createContact: async (contactData) => {
+    const contact = new Contact({
+      _id: new mongoose.Types.ObjectId(),
+      updatedAt: new Date(),
+      ...contactData
+    });
+    return await contact.save();
+  },
+
+  getContactById: async (contactId, workspaceId) => {
+    return await Contact.findOne({
+      _id: contactId,
+      workspaceId
+    }).populate('createdBy', 'name email');
+  },
+
+  updateContact: async (contactId, workspaceId, updateData) => {
+    return await Contact.findOneAndUpdate(
+      { _id: contactId, workspaceId },
+      { ...updateData, updatedAt: new Date() },
+      { new: true }
+    );
+  },
+
+  deleteContact: async (contactId, workspaceId) => {
+    return await Contact.findOneAndDelete({
+      _id: contactId,
+      workspaceId
+    });
+  },
+
+  // get contacts by phone number for campaigns
+  getContactsByPhoneNumbers: async (workspaceId, phoneNumbers) => {
+    return await Contact.find({
+      workspaceId,
+      phoneNumber: { $in: phoneNumbers }
+    });
+  },
+
+  // get contacts by tags for campaigns
+  getContactsByTags: async (workspaceId, tags) => {
+    return await Contact.find({
+      workspaceId,
+      tags: { $in: tags }
+    });
+  },
+
+  // search querry
+  searchContacts: async (workspaceId, searchTerm, page = 1, limit = 10) => {
+    const skip = (page - 1) * limit;
+    return await Contact.find({
+      workspaceId,
+      $or: [
+        { name: { $regex: searchTerm, $options: 'i' } },
+        { phoneNumber: { $regex: searchTerm, $options: 'i' } }
+      ]
+    })
+    .populate('createdBy', 'name email')
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit)
+    .exec();
+  }
+};
