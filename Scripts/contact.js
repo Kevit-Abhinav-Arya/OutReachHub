@@ -1,3 +1,4 @@
+
 // API Configuration
 const CONTACTS_API_BASE_URL = "http://localhost:3000";
 const CONTACT_ENDPOINTS = {
@@ -292,7 +293,7 @@ async function viewContact(contactId) {
     
     // Updating tags
     const tagsContainer = document.querySelector('#viewModal .tags-list');
-    if (contact.tags && contact.tags.length > 0) {
+    if (contact.tags && contact.tags.length > 0) {  
       tagsContainer.innerHTML = contact.tags.map(tag => 
         `<span class="tag">${(tag)}</span>`
       ).join('');
@@ -644,12 +645,14 @@ function toggleTagFilter() {
 
 
 
+//--------------------------------------------------------------------------------
+// Notification logic
+//--------------------------------------------------------------------------------
 
 function safeShowNotification(message, type = 'info') {
   if (typeof showNotification === 'function') {
     showNotification(message, type);
   } else {
-    // Fallback notification
     console.log(`${type.toUpperCase()}: ${message}`);
     alert(`${type.toUpperCase()}: ${message}`);
   }

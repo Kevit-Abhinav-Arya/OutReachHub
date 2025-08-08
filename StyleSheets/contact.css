@@ -311,6 +311,7 @@
 .contact-card:hover {
   transform: translateX(5px);
   box-shadow: 0 4px 20px rgba(0, 180, 216, 0.2), inset 0 0 20px rgba(0, 180, 216, 0.1);
+  border: 0.5px solid rgba(0, 180, 216, 0.7);
 }
 .contact-card .contact-info {
   display: flex;
