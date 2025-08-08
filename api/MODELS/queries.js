@@ -138,3 +138,156 @@ const workspaceUserQueries = {
     );
   }
 };
+
+// ------------------------------------------------------------------
+// OUTREACHHUB PORTAL QUERIES
+// ------------------------------------------------------------------
+
+//User Authentication
+const userAuthQueries = {
+
+  findUserByEmail: async (email) => {
+    return await User.findOne({ email }).populate('workspaces.workspaceId');
+  },
+
+  getUserWorkspaces: async (userId) => {
+    return await User.findById(userId).populate('workspaces.workspaceId');
+  }
+};
+
+//Home module, analytical datas
+//chart data
+const analyticsQueries = {
+
+  getCampaignsPerDay: async (workspaceId, startDate, endDate) => {
+    return await Campaign.aggregate([
+      {
+        $match: {
+          workspaceId: new mongoose.Types.ObjectId(workspaceId),
+          launchedAt: {
+            $gte: new Date(startDate),
+            $lte: new Date(endDate)
+          }
+        }
+      },
+      {
+        $group: {
+          _id: {
+            $dateToString: {
+              format: "%Y-%m-%d",
+              date: "$launchedAt"
+            }
+          },
+          count: { $sum: 1 }
+        }
+      },
+      { $sort: { "_id": 1 } }
+    ]);
+  },
+
+  // Getting message sent pertype per day
+  getMessagesSentPerTypePerDay: async (workspaceId, startDate, endDate) => {
+    return await CampaignMessage.aggregate([
+      {
+        $match: {
+          workspaceId: new mongoose.Types.ObjectId(workspaceId),
+          sentAt: {
+            $gte: new Date(startDate),
+            $lte: new Date(endDate)
+          }
+        }
+      },
+      {
+        $addFields: {
+          messageType: {
+            $cond: {
+              if: { $ne: ["$messageImageUrl", null] },
+              then: "Text & Image",
+              else: "Text"
+            }
+          }
+        }
+      },
+      {
+        $group: {
+          _id: {
+            date: {
+              $dateToString: {
+                format: "%Y-%m-%d",
+                date: "$sentAt"
+              }
+            },
+            type: "$messageType"
+          },
+          count: { $sum: 1 }
+        }
+      },
+      { $sort: { "_id.date": 1, "_id.type": 1 } }
+    ]);
+  },
+
+  //Number of contacts reached per day
+  getContactsReachedPerDay: async (workspaceId, startDate, endDate) => {
+    return await CampaignMessage.aggregate([
+      {
+        $match: {
+          workspaceId: new mongoose.Types.ObjectId(workspaceId),
+          sentAt: {
+            $gte: new Date(startDate),
+            $lte: new Date(endDate)
+          }
+        }
+      },
+      {
+        $group: {
+          _id: {
+            date: {
+              $dateToString: {
+                format: "%Y-%m-%d",
+                date: "$sentAt"
+              }
+            }
+          },
+          uniqueContacts: { $addToSet: "$contactPhoneNumber" }
+        }
+      },
+      {
+        $project: {
+          _id: 1,
+          count: { $size: "$uniqueContacts" }
+        }
+      },
+      { $sort: { "_id": 1 } }
+    ]);
+  },
+
+  // Table Data
+
+  //list of 5 recent campaigns
+  getRecentCampaigns: async (workspaceId) => {
+    return await Campaign.find({ workspaceId })
+      .sort({ createdAt: -1 })
+      .limit(5)
+      .exec();
+  },
+
+  //list of top 5 tags with most contacts
+  getTopContactTags: async (workspaceId) => {
+    return await Contact.aggregate([
+      {
+        $match: {
+          workspaceId: new mongoose.Types.ObjectId(workspaceId)
+        }
+      },
+      { $unwind: "$tags" },
+      {
+        $group: {
+          _id: "$tags",
+          contactCount: { $sum: 1 }
+        }
+      },
+      { $sort: { contactCount: -1 } },
+      { $limit: 5 }
+    ]);
+  }
+};
