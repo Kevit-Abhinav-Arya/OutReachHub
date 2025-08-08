@@ -597,3 +597,65 @@ const campaignMessageQueries = {
     .exec();
   }
 };
+
+// ------------------------------------------------------------------
+// UTILITY QUERIES
+// ------------------------------------------------------------------
+
+
+const utilityQueries = {
+
+  // Check if user has access to workspace
+  checkUserWorkspaceAccess: async (userId, workspaceId) => {
+    const user = await User.findOne({
+      _id: userId,
+      'workspaces.workspaceId': workspaceId
+    });
+    
+    if (!user) return null;
+    
+    const workspace = user.workspaces.find(
+      ws => ws.workspaceId.toString() === workspaceId.toString()
+    );
+    
+    return workspace ? workspace.role : null;
+  },
+
+  // gives all the tags in the workspace
+  getWorkspaceTags: async (workspaceId) => {
+    return await Contact.aggregate([
+      {
+        $match: {
+          workspaceId: new mongoose.Types.ObjectId(workspaceId)
+        }
+      },
+      { $unwind: "$tags" },
+      {
+        $group: {
+          _id: "$tags"
+        }
+      },
+      { $sort: { "_id": 1 } }
+    ]);
+  },
+
+  // Check if phone number exists in workspace
+  checkPhoneNumberExists: async (workspaceId, phoneNumber) => {
+    let query = { workspaceId, phoneNumber };
+   
+    return await Contact.findOne(query);
+  }
+};
+
+module.exports = {
+  adminQueries,
+  workspaceQueries,
+  workspaceUserQueries,
+  userAuthQueries,
+  analyticsQueries,
+  contactQueries,
+  messageQueries,
+  campaignQueries,
+  campaignMessageQueries,
+  utilityQueries
+};
