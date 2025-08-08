@@ -432,3 +432,121 @@ const messageQueries = {
     });
   }
 };
+
+//campaign module
+
+const campaignQueries = {
+  listCampaigns: async (workspaceId, page = 1, limit = 10, statusFilter = null) => {
+    const skip = (page - 1) * limit;
+    let query = { workspaceId };
+    
+    if (statusFilter) {
+      query.status = statusFilter;
+    }
+
+    return await Campaign.find(query)
+      .populate('templateId', 'name type')
+      .populate('createdBy', 'name email')
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .exec();
+  },
+
+  getCampaignsCount: async (workspaceId, statusFilter = null) => {
+    let query = { workspaceId };
+    if (statusFilter) {
+      query.status = statusFilter;
+    }
+    return await Campaign.countDocuments(query);
+  },
+
+  
+  createCampaign: async (campaignData) => {
+    const campaign = new Campaign({
+      _id: new mongoose.Types.ObjectId(),
+      status: 'Draft',
+      ...campaignData
+    });
+    return await campaign.save();
+  },
+
+  getCampaignById: async (campaignId, workspaceId) => {
+    return await Campaign.findOne({
+      _id: campaignId,
+      workspaceId
+    })
+    .populate('templateId')
+    .populate('createdBy', 'name email');
+  },
+
+  //updating campaign only when it is in draft state
+
+  updateCampaign: async (campaignId, workspaceId, updateData) => {
+    return await Campaign.findOneAndUpdate(
+      { 
+        _id: campaignId, 
+        workspaceId,
+        status: 'Draft' 
+      },
+      updateData,
+      { new: true }
+    );
+  },
+
+  deleteCampaign: async (campaignId, workspaceId) => {
+    return await Campaign.findOneAndDelete({
+      _id: campaignId,
+      workspaceId
+    });
+  },
+
+  // Copy campaign 
+  copyCampaign: async (campaignId, workspaceId, newName) => {
+    const originalCampaign = await Campaign.findOne({
+      _id: campaignId,
+      workspaceId
+    });
+
+    if (!originalCampaign) return null;
+
+    const copiedCampaign = new Campaign({
+      _id: new mongoose.Types.ObjectId(),
+      workspaceId: originalCampaign.workspaceId,
+      name: newName,
+      targetTags: [...originalCampaign.targetTags],
+      templateId: originalCampaign.templateId,
+      status: 'Draft',
+      createdBy: originalCampaign.createdBy,
+      createdAt: new Date()
+    });
+
+    return await copiedCampaign.save();
+  },
+
+  // Launch campaign 
+  launchCampaign: async (campaignId, workspaceId) => {
+    return await Campaign.findOneAndUpdate(
+      { 
+        _id: campaignId, 
+        workspaceId,
+        status: 'Draft'
+      },
+      { 
+        status: 'Running',
+        launchedAt: new Date()
+      },
+      { new: true }
+    );
+  },
+
+  // Update campaign status
+  updateCampaignStatus: async (campaignId, status) => {
+    return await Campaign.findByIdAndUpdate(
+      campaignId,
+      { status },
+      { new: true }
+    );
+  },
+
+};
