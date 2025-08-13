@@ -10,7 +10,6 @@ const userSchema = mongoose.Schema({
   workspaces: [ 
     {
       workspaceId: { type: mongoose.Schema.Types.ObjectId, ref: 'Workspace', required: true },
-      workspaceName: {type: String, ref: 'Workspace', required:true},
       role: { type: String, enum: ['Editor', 'Viewer'], required: true }
     }
   ],
