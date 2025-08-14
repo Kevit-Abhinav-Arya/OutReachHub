@@ -4,8 +4,8 @@ const campaignMessageSchema = mongoose.Schema({
     
   
   _id: mongoose.Schema.Types.ObjectId,
-  workspaceId: { type: mongoose.Schema.Types.ObjectId, ref: 'Workspace', required: true, index: true },
-  campaignId: { type: mongoose.Schema.Types.ObjectId, ref: 'Campaigns', required: true, index: true },
+  workspaceId: { type: mongoose.Schema.Types.ObjectId, ref: 'Workspace', required: true },
+  campaignId: { type: mongoose.Schema.Types.ObjectId, ref: 'Campaigns', required: true },
   contactId: { type: mongoose.Schema.Types.ObjectId, ref: 'Contacts' },
 
   contactPhoneNumber: { type: String, required: true },
