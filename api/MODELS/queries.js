@@ -179,6 +179,74 @@ createWorkspaceUser: async (userData) => {
 };
 
 // ------------------------------------------------------------------
+// USER MANAGEMENT QUERIES
+// ------------------------------------------------------------------
+
+const userManagementQueries = {
+  createUser: async (userData) => {
+    const user = new User({
+      _id: new mongoose.Types.ObjectId(),
+      workspaces: [], // Initially no workspaces assigned
+      ...userData
+    });
+    return await user.save();
+  },
+
+  
+  getAllUsers: async (page = 1, limit = 10) => {
+    const skip = (page - 1) * limit;
+    return await User.find()
+      .populate('workspaces.workspaceId', 'name')
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .exec();
+  },
+
+  getAllUsersCount: async () => {
+    return await User.countDocuments();
+  },
+
+  getUserById: async (userId) => {
+    return await User.findById(userId).populate('workspaces.workspaceId', 'name');
+  },
+
+  updateUser: async (userId, updateData) => {
+    return await User.findByIdAndUpdate(
+      userId,
+      { ...updateData },
+      { new: true }
+    ).populate('workspaces.workspaceId', 'name');
+  },
+
+  deleteUser: async (userId) => {
+    return await User.findByIdAndDelete(userId);
+  },
+
+
+
+  searchUsers: async (searchTerm, page = 1, limit = 10) => {
+    const skip = (page - 1) * limit;
+    return await User.find({
+      $or: [
+        { name: { $regex: searchTerm, $options: 'i' } },
+        { email: { $regex: searchTerm, $options: 'i' } }
+      ]
+    })
+    .populate('workspaces.workspaceId', 'name')
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit)
+    .exec();
+  },
+
+  getUserByEmail: async (email) => {
+    return await User.findOne({ email }).populate('workspaces.workspaceId', 'name');
+  }
+};
+
+
+// ------------------------------------------------------------------
 // OUTREACHHUB PORTAL QUERIES
 // ------------------------------------------------------------------
 
@@ -696,5 +764,7 @@ module.exports = {
   messageQueries,
   campaignQueries,
   campaignMessageQueries,
-  utilityQueries
+  utilityQueries,
+  userManagementQueries
+
 };

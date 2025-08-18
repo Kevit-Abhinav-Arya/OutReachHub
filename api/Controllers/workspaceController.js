@@ -198,7 +198,7 @@ const createWorkspaceUser = async (req, res) => {
     if (!workspace) {
       return res.status(404).json({ message: 'Workspace not found' });
     }
-
+    
     // Checking if user already exists
     const existingUser = await userAuthQueries.findUserByEmail(email);
 
@@ -206,7 +206,7 @@ const createWorkspaceUser = async (req, res) => {
     
     if (existingUser) {
       const isUserInWorkspace = existingUser.workspaces.some(
-        w => w.workspaceId.toString() === workspaceId
+        w => w.workspaceId._id.toString() === workspaceId
       );
 
       if (isUserInWorkspace) {
