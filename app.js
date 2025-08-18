@@ -7,6 +7,8 @@ const morgan = require('morgan');
 //Routes
 const authRoutes = require('./api/Routes/Authentication');
 const workspaceRoutes = require('./api/Routes/workspaces');
+const userRoutes = require('./api/Routes/users');
+
 
 dotenv.config();
 
@@ -29,6 +31,8 @@ mongoose.connect(process.env.MONGO_URI)
 //API routes
 app.use('/api/auth', authRoutes);
 app.use('/api/workspaces', workspaceRoutes);
+app.use('/api/users', userRoutes);
+
 
 
 //404 error

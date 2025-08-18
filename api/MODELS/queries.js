@@ -152,12 +152,13 @@ createWorkspaceUser: async (userData) => {
     return await User.findByIdAndDelete(userId);
   },
 
-  addUserToWorkspace: async (userId, workspaceId, role) => {
+ 
+  addUserToWorkspace: async (userId, workspaceId, workspaceName,role) => {
     return await User.findByIdAndUpdate(
       userId,
       {
         $push: {
-          workspaces: { workspaceId, role }
+          workspaces: { workspaceId, workspaceName, role }
         }
       },
       { new: true }
@@ -186,7 +187,7 @@ const userManagementQueries = {
   createUser: async (userData) => {
     const user = new User({
       _id: new mongoose.Types.ObjectId(),
-      workspaces: [], // Initially no workspaces assigned
+      workspaces: [], 
       ...userData
     });
     return await user.save();
