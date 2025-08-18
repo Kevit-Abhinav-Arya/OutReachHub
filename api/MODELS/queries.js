@@ -31,15 +31,25 @@ const adminQueries = {
 //Workspace Module
 const workspaceQueries = {
 
-  listWorkspaces: async (page = 1, limit = 10) => {
+ listWorkspaces: async (options = {}) => {
+    const { page = 1, limit = 10, search = '' } = options;
     const skip = (page - 1) * limit;
-    return await Workspace.find()
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit)
-      .exec();
-  },
+    
+    let query = {};
+    if (search) {
+      query.name = { $regex: search, $options: 'i' };
+    }
+    const [workspaces, total] = await Promise.all([
+      Workspace.find(query)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .exec(),
+      Workspace.countDocuments(query)
+    ]);
 
+    return { workspaces, total };
+  },
   getWorkspacesCount: async () => {
     return await Workspace.countDocuments();
   },
@@ -56,12 +66,26 @@ const workspaceQueries = {
     return await Workspace.findById(workspaceId);
   },
 
-  updateWorkspace: async (workspaceId, updateData) => {
-    return await Workspace.findByIdAndUpdate(
+ updateWorkspace: async (workspaceId, updateData) => {
+    const updatedWorkspace = await Workspace.findByIdAndUpdate(
       workspaceId,
       { ...updateData },
       { new: true }
     );
+
+    if (updateData.name && updatedWorkspace) {
+      await User.updateMany(
+        { 'workspaces.workspaceId': workspaceId.toString() },
+        { 
+          $set: { 
+            'workspaces.$.workspaceName': updateData.name 
+          }
+        }
+      );
+      console.log("user updated");
+    }
+
+    return updatedWorkspace;
   },
 
   // Delete workspace
@@ -74,13 +98,21 @@ const workspaceQueries = {
 const workspaceUserQueries = {
   listWorkspaceUsers: async (workspaceId, page = 1, limit = 10) => {
     const skip = (page - 1) * limit;
-    return await User.find({
-      'workspaces.workspaceId': workspaceId
-    })
-    .sort({ createdAt: -1 })
-    .skip(skip)
-    .limit(limit)
-    .exec();
+    const query = { 'workspaces.workspaceId': workspaceId };
+    
+    const [users, total] = await Promise.all([
+      User.find(query)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .exec(),
+      User.countDocuments(query),
+
+      
+
+    ]);
+    
+    return { users, total };
   },
 
   getWorkspaceUsersCount: async (workspaceId) => {
@@ -89,10 +121,17 @@ const workspaceUserQueries = {
     });
   },
 
-  createWorkspaceUser: async (userData) => {
+createWorkspaceUser: async (userData) => {
+    const { workspaceId, role, workspaceName, ...userInfo } = userData;
+    
     const user = new User({
       _id: new mongoose.Types.ObjectId(),
-      ...userData
+      ...userInfo,
+      workspaces: [{
+        workspaceId: workspaceId,
+        workspaceName: workspaceName,
+        role: role
+      }]
     });
     return await user.save();
   },

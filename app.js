@@ -4,7 +4,10 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const morgan = require('morgan');
 
-// Load environment variables
+//Routes
+const authRoutes = require('./api/Routes/Authentication');
+const workspaceRoutes = require('./api/Routes/workspaces');
+
 dotenv.config();
 
 const app = express();
@@ -19,12 +22,23 @@ mongoose.connect(process.env.MONGO_URI)
 .then(() => console.log('Database Connected'))
 .catch(err => console.log('Database connection error:', err));
 
-//Routes
-const authRoutes = require('./api/Routes/Authentication');
+
+
 
 
 //API routes
 app.use('/api/auth', authRoutes);
+app.use('/api/workspaces', workspaceRoutes);
+
+
+//404 error
+app.use((req, res) => {
+  res.status(404).json({
+    message: 'Route not found',
+    path: req.originalUrl,
+    method: req.method
+  });
+})
 
 
 module.exports = app;
