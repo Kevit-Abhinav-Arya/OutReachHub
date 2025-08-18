@@ -401,7 +401,8 @@ const analyticsQueries = {
 };
 //contacts module
 const contactQueries = {
-  listContacts: async (workspaceId, page = 1, limit = 10, tagFilter = null) => {
+
+    listContacts: async (workspaceId, page = 1, limit = 10, tagFilter = null, search = '') => {
     const skip = (page - 1) * limit;
     let query = { workspaceId };
     
@@ -409,12 +410,26 @@ const contactQueries = {
       query.tags = { $in: [tagFilter] };
     }
 
-    return await Contact.find(query)
-      .populate('createdBy', 'name email')
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit)
-      .exec();
+    if (search) {
+      
+      query.$or = [
+        { phoneNumber: { $regex: escapedSearch, $options: 'i' } },
+        { email: { $regex: escapedSearch, $options: 'i' } },
+        { name: { $regex: escapedSearch, $options: 'i' } },
+      ];
+    }
+
+    const [contacts, total] = await Promise.all([
+      Contact.find(query)
+        .populate('createdBy', 'name email')
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .exec(),
+      Contact.countDocuments(query)
+    ]);
+
+    return { contacts, total };
   },
 
  
