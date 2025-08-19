@@ -482,21 +482,7 @@ const contactQueries = {
   },
 
   // search querry
-  searchContacts: async (workspaceId, searchTerm, page = 1, limit = 10) => {
-    const skip = (page - 1) * limit;
-    return await Contact.find({
-      workspaceId,
-      $or: [
-        { name: { $regex: searchTerm, $options: 'i' } },
-        { phoneNumber: { $regex: searchTerm, $options: 'i' } }
-      ]
-    })
-    .populate('createdBy', 'name email')
-    .sort({ createdAt: -1 })
-    .skip(skip)
-    .limit(limit)
-    .exec();
-  }
+ 
 };
 
 //Message template MOdule
@@ -579,7 +565,7 @@ const messageQueries = {
 //campaign module
 
 const campaignQueries = {
-  listCampaigns: async (workspaceId, page = 1, limit = 10, statusFilter = null) => {
+  listCampaigns: async (workspaceId, page = 1, limit = 10, statusFilter = null, searchFilter= '') => {
     const skip = (page - 1) * limit;
     let query = { workspaceId };
     
@@ -587,13 +573,21 @@ const campaignQueries = {
       query.status = statusFilter;
     }
 
-    return await Campaign.find(query)
+    if (searchFilter && searchFilter.trim()) {
+      query.name = { $regex: searchFilter, $options: 'i' };
+    }
+
+    const campaigns = await Campaign.find(query)
       .populate('templateId', 'name type')
       .populate('createdBy', 'name email')
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
       .exec();
+
+    const total = await Campaign.countDocuments(query);
+
+    return { campaigns, total };
   },
 
   getCampaignsCount: async (workspaceId, statusFilter = null) => {
@@ -621,6 +615,13 @@ const campaignQueries = {
     })
     .populate('templateId')
     .populate('createdBy', 'name email');
+  },
+
+    getCampaignByName: async (workspaceId, name) => {
+  let query = { workspaceId, name };
+   
+  return await Campaign.findOne(query);
+
   },
 
   //updating campaign only when it is in draft state

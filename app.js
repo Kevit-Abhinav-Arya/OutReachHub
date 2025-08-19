@@ -10,6 +10,7 @@ const workspaceRoutes = require('./api/Routes/workspaces');
 const userRoutes = require('./api/Routes/users');
 const contactRoutes = require('./api/Routes/contacts');
 const messageTemplateRoutes = require('./api/Routes/messageTemplates');
+const campaignRoutes = require('./api/Routes/campaigns');
 
 
 
@@ -37,6 +38,8 @@ app.use('/api/workspaces', workspaceRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/contacts', contactRoutes);
 app.use('/api/message-templates', messageTemplateRoutes);
+app.use('/api/campaigns', campaignRoutes);
+
 
 
 
