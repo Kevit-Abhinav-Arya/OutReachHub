@@ -413,9 +413,9 @@ const contactQueries = {
     if (search) {
       
       query.$or = [
-        { phoneNumber: { $regex: escapedSearch, $options: 'i' } },
-        { email: { $regex: escapedSearch, $options: 'i' } },
-        { name: { $regex: escapedSearch, $options: 'i' } },
+        { phoneNumber: { $regex: search, $options: 'i' } },
+        { email: { $regex: search, $options: 'i' } },
+        { name: { $regex: search, $options: 'i' } },
       ];
     }
 
@@ -501,21 +501,33 @@ const contactQueries = {
 
 //Message template MOdule
 const messageQueries = {
-  listMessages: async (workspaceId, page = 1, limit = 10, typeFilter = null) => {
+  
+ listMessages: async (workspaceId, page = 1, limit = 10, typeFilter = null,search = '') => {
     const skip = (page - 1) * limit;
     let query = { workspaceId };
     
     if (typeFilter) {
       query.type = typeFilter;
     }
+    if(search)
+    {
+     query.$or = [
+        { name: { $regex: search, $options: 'i' } },
+      ];
+    }
+     const [messages, total] = await Promise.all([
+      Message.find(query)
+        .populate('createdBy', 'name email')
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .exec(),
+      Message.countDocuments(query)
+    ]);
 
-    return await Message.find(query)
-      .populate('createdBy', 'name email')
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit)
-      .exec();
+    return {messages,total};
   },
+
 
   getMessagesCount: async (workspaceId, typeFilter = null) => {
     let query = { workspaceId };
@@ -539,6 +551,14 @@ const messageQueries = {
       workspaceId
     }).populate('createdBy', 'name email');
   },
+
+   getMessageByName: async (workspaceId, name) => {
+  let query = { workspaceId, name };
+   
+  return await Message.findOne(query);
+
+  },
+
 
   updateMessage: async (messageId, workspaceId, updateData) => {
     return await Message.findOneAndUpdate(
