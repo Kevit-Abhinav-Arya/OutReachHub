@@ -31,15 +31,25 @@ const adminQueries = {
 //Workspace Module
 const workspaceQueries = {
 
-  listWorkspaces: async (page = 1, limit = 10) => {
+ listWorkspaces: async (options = {}) => {
+    const { page = 1, limit = 10, search = '' } = options;
     const skip = (page - 1) * limit;
-    return await Workspace.find()
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit)
-      .exec();
-  },
+    
+    let query = {};
+    if (search) {
+      query.name = { $regex: search, $options: 'i' };
+    }
+    const [workspaces, total] = await Promise.all([
+      Workspace.find(query)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .exec(),
+      Workspace.countDocuments(query)
+    ]);
 
+    return { workspaces, total };
+  },
   getWorkspacesCount: async () => {
     return await Workspace.countDocuments();
   },
@@ -56,12 +66,26 @@ const workspaceQueries = {
     return await Workspace.findById(workspaceId);
   },
 
-  updateWorkspace: async (workspaceId, updateData) => {
-    return await Workspace.findByIdAndUpdate(
+ updateWorkspace: async (workspaceId, updateData) => {
+    const updatedWorkspace = await Workspace.findByIdAndUpdate(
       workspaceId,
       { ...updateData },
       { new: true }
     );
+
+    if (updateData.name && updatedWorkspace) {
+      await User.updateMany(
+        { 'workspaces.workspaceId': workspaceId.toString() },
+        { 
+          $set: { 
+            'workspaces.$.workspaceName': updateData.name 
+          }
+        }
+      );
+      console.log("user updated");
+    }
+
+    return updatedWorkspace;
   },
 
   // Delete workspace
@@ -74,13 +98,21 @@ const workspaceQueries = {
 const workspaceUserQueries = {
   listWorkspaceUsers: async (workspaceId, page = 1, limit = 10) => {
     const skip = (page - 1) * limit;
-    return await User.find({
-      'workspaces.workspaceId': workspaceId
-    })
-    .sort({ createdAt: -1 })
-    .skip(skip)
-    .limit(limit)
-    .exec();
+    const query = { 'workspaces.workspaceId': workspaceId };
+    
+    const [users, total] = await Promise.all([
+      User.find(query)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .exec(),
+      User.countDocuments(query),
+
+      
+
+    ]);
+    
+    return { users, total };
   },
 
   getWorkspaceUsersCount: async (workspaceId) => {
@@ -89,10 +121,17 @@ const workspaceUserQueries = {
     });
   },
 
-  createWorkspaceUser: async (userData) => {
+createWorkspaceUser: async (userData) => {
+    const { workspaceId, role, workspaceName, ...userInfo } = userData;
+    
     const user = new User({
       _id: new mongoose.Types.ObjectId(),
-      ...userData
+      ...userInfo,
+      workspaces: [{
+        workspaceId: workspaceId,
+        workspaceName: workspaceName,
+        role: role
+      }]
     });
     return await user.save();
   },
@@ -113,12 +152,13 @@ const workspaceUserQueries = {
     return await User.findByIdAndDelete(userId);
   },
 
-  addUserToWorkspace: async (userId, workspaceId, role) => {
+ 
+  addUserToWorkspace: async (userId, workspaceId, workspaceName,role) => {
     return await User.findByIdAndUpdate(
       userId,
       {
         $push: {
-          workspaces: { workspaceId, role }
+          workspaces: { workspaceId, workspaceName, role }
         }
       },
       { new: true }
@@ -138,6 +178,74 @@ const workspaceUserQueries = {
     );
   }
 };
+
+// ------------------------------------------------------------------
+// USER MANAGEMENT QUERIES
+// ------------------------------------------------------------------
+
+const userManagementQueries = {
+  createUser: async (userData) => {
+    const user = new User({
+      _id: new mongoose.Types.ObjectId(),
+      workspaces: [], 
+      ...userData
+    });
+    return await user.save();
+  },
+
+  
+  getAllUsers: async (page = 1, limit = 10) => {
+    const skip = (page - 1) * limit;
+    return await User.find()
+      .populate('workspaces.workspaceId', 'name')
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .exec();
+  },
+
+  getAllUsersCount: async () => {
+    return await User.countDocuments();
+  },
+
+  getUserById: async (userId) => {
+    return await User.findById(userId).populate('workspaces.workspaceId', 'name');
+  },
+
+  updateUser: async (userId, updateData) => {
+    return await User.findByIdAndUpdate(
+      userId,
+      { ...updateData },
+      { new: true }
+    ).populate('workspaces.workspaceId', 'name');
+  },
+
+  deleteUser: async (userId) => {
+    return await User.findByIdAndDelete(userId);
+  },
+
+
+
+  searchUsers: async (searchTerm, page = 1, limit = 10) => {
+    const skip = (page - 1) * limit;
+    return await User.find({
+      $or: [
+        { name: { $regex: searchTerm, $options: 'i' } },
+        { email: { $regex: searchTerm, $options: 'i' } }
+      ]
+    })
+    .populate('workspaces.workspaceId', 'name')
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit)
+    .exec();
+  },
+
+  getUserByEmail: async (email) => {
+    return await User.findOne({ email }).populate('workspaces.workspaceId', 'name');
+  }
+};
+
 
 // ------------------------------------------------------------------
 // OUTREACHHUB PORTAL QUERIES
@@ -293,7 +401,8 @@ const analyticsQueries = {
 };
 //contacts module
 const contactQueries = {
-  listContacts: async (workspaceId, page = 1, limit = 10, tagFilter = null) => {
+
+    listContacts: async (workspaceId, page = 1, limit = 10, tagFilter = null, search = '') => {
     const skip = (page - 1) * limit;
     let query = { workspaceId };
     
@@ -301,12 +410,26 @@ const contactQueries = {
       query.tags = { $in: [tagFilter] };
     }
 
-    return await Contact.find(query)
-      .populate('createdBy', 'name email')
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit)
-      .exec();
+    if (search) {
+      
+      query.$or = [
+        { phoneNumber: { $regex: search, $options: 'i' } },
+        { email: { $regex: search, $options: 'i' } },
+        { name: { $regex: search, $options: 'i' } },
+      ];
+    }
+
+    const [contacts, total] = await Promise.all([
+      Contact.find(query)
+        .populate('createdBy', 'name email')
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .exec(),
+      Contact.countDocuments(query)
+    ]);
+
+    return { contacts, total };
   },
 
  
@@ -359,40 +482,38 @@ const contactQueries = {
   },
 
   // search querry
-  searchContacts: async (workspaceId, searchTerm, page = 1, limit = 10) => {
-    const skip = (page - 1) * limit;
-    return await Contact.find({
-      workspaceId,
-      $or: [
-        { name: { $regex: searchTerm, $options: 'i' } },
-        { phoneNumber: { $regex: searchTerm, $options: 'i' } }
-      ]
-    })
-    .populate('createdBy', 'name email')
-    .sort({ createdAt: -1 })
-    .skip(skip)
-    .limit(limit)
-    .exec();
-  }
+ 
 };
 
 //Message template MOdule
 const messageQueries = {
-  listMessages: async (workspaceId, page = 1, limit = 10, typeFilter = null) => {
+  
+ listMessages: async (workspaceId, page = 1, limit = 10, typeFilter = null,search = '') => {
     const skip = (page - 1) * limit;
     let query = { workspaceId };
     
     if (typeFilter) {
       query.type = typeFilter;
     }
+    if(search)
+    {
+     query.$or = [
+        { name: { $regex: search, $options: 'i' } },
+      ];
+    }
+     const [messages, total] = await Promise.all([
+      Message.find(query)
+        .populate('createdBy', 'name email')
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .exec(),
+      Message.countDocuments(query)
+    ]);
 
-    return await Message.find(query)
-      .populate('createdBy', 'name email')
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit)
-      .exec();
+    return {messages,total};
   },
+
 
   getMessagesCount: async (workspaceId, typeFilter = null) => {
     let query = { workspaceId };
@@ -417,6 +538,14 @@ const messageQueries = {
     }).populate('createdBy', 'name email');
   },
 
+   getMessageByName: async (workspaceId, name) => {
+  let query = { workspaceId, name };
+   
+  return await Message.findOne(query);
+
+  },
+
+
   updateMessage: async (messageId, workspaceId, updateData) => {
     return await Message.findOneAndUpdate(
       { _id: messageId, workspaceId },
@@ -436,7 +565,7 @@ const messageQueries = {
 //campaign module
 
 const campaignQueries = {
-  listCampaigns: async (workspaceId, page = 1, limit = 10, statusFilter = null) => {
+  listCampaigns: async (workspaceId, page = 1, limit = 10, statusFilter = null, searchFilter= '') => {
     const skip = (page - 1) * limit;
     let query = { workspaceId };
     
@@ -444,13 +573,21 @@ const campaignQueries = {
       query.status = statusFilter;
     }
 
-    return await Campaign.find(query)
+    if (searchFilter && searchFilter.trim()) {
+      query.name = { $regex: searchFilter, $options: 'i' };
+    }
+
+    const campaigns = await Campaign.find(query)
       .populate('templateId', 'name type')
       .populate('createdBy', 'name email')
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
       .exec();
+
+    const total = await Campaign.countDocuments(query);
+
+    return { campaigns, total };
   },
 
   getCampaignsCount: async (workspaceId, statusFilter = null) => {
@@ -478,6 +615,13 @@ const campaignQueries = {
     })
     .populate('templateId')
     .populate('createdBy', 'name email');
+  },
+
+    getCampaignByName: async (workspaceId, name) => {
+  let query = { workspaceId, name };
+   
+  return await Campaign.findOne(query);
+
   },
 
   //updating campaign only when it is in draft state
@@ -554,48 +698,16 @@ const campaignQueries = {
 //Campaign Message Module
 const campaignMessageQueries = {
 
-  createCampaignMessage: async (messageData) => {
-    const campaignMessage = new CampaignMessage({
+   createCampaignMessages: async (messagesArray) => {
+    console.log("inside bulk create messages............");
+    const messages = messagesArray.map(messageData => ({
       _id: new mongoose.Types.ObjectId(),
       sentAt: new Date(),
       ...messageData
-    });
-    return await campaignMessage.save();
+    }));
+    return await CampaignMessage.insertMany(messages);
   },
 
-
-
-  getCampaignMessages: async (campaignId, workspaceId, page = 1, limit = 10) => {
-    const skip = (page - 1) * limit;
-    return await CampaignMessage.find({
-      campaignId,
-      workspaceId
-    })
-    .sort({ sentAt: -1 })
-    .skip(skip)
-    .limit(limit)
-    .exec();
-  },
-
-  getCampaignMessagesCount: async (campaignId, workspaceId) => {
-    return await CampaignMessage.countDocuments({
-      campaignId,
-      workspaceId
-    });
-  },
-
-  getCampaignMessagesByContact: async (workspaceId, contactId, page = 1, limit = 10) => {
-    const skip = (page - 1) * limit;
-    return await CampaignMessage.find({
-      workspaceId,
-      contactId
-    })
-    .populate('campaignId', 'name')
-    .sort({ sentAt: -1 })
-    .skip(skip)
-    .limit(limit)
-    .exec();
-  }
 };
 
 // ------------------------------------------------------------------
@@ -657,5 +769,7 @@ module.exports = {
   messageQueries,
   campaignQueries,
   campaignMessageQueries,
-  utilityQueries
+  utilityQueries,
+  userManagementQueries
+
 };

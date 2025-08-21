@@ -4,12 +4,13 @@ const userSchema = mongoose.Schema({
 
     
   _id: mongoose.Schema.Types.ObjectId,
-  email: { type: String, required: true, unique: true },
+  email: { type: String, required: true },
   password: { type: String, required: true },
   name: { type: String, required: true },
   workspaces: [ 
     {
       workspaceId: { type: mongoose.Schema.Types.ObjectId, ref: 'Workspace', required: true },
+      workspaceName: {type: String, ref: 'Workspace', required:true},
       role: { type: String, enum: ['Editor', 'Viewer'], required: true }
     }
   ],
