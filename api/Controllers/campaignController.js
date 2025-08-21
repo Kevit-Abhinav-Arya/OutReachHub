@@ -404,25 +404,16 @@ const launchCampaign = async (req, res) => {
       });
     }
 
-    if (!campaign.templateId) {
-      return res.status(400).json({ 
-        message: 'Campaign template not found' 
-      });
-    }
-
-    await campaignQueries.updateCampaign(id, {
-      status: 'Running',
-      launchedAt: new Date()
-    });
+  
 
     const contacts = await contactQueries.getContactsByTags(
       workspaceId,
       campaign.targetTags
     );
-
+    
     if (contacts.length === 0) {
-      await campaignQueries.updateCampaign(id, { status: 'Completed' });
-
+      await campaignQueries.updateCampaign(id, workspaceId, { status: 'Completed' });
+      
       return res.json({
         message: 'Campaign launched but no contacts found with target tags',
         campaign: {
@@ -433,6 +424,11 @@ const launchCampaign = async (req, res) => {
         }
       });
     }
+    
+    await campaignQueries.updateCampaign(id, workspaceId, {
+      status: 'Running',
+      launchedAt: new Date()
+    });
 
     const campaignMessages = [];
     
@@ -448,14 +444,14 @@ const launchCampaign = async (req, res) => {
         messageImageUrl: campaign.templateId.imageUrl,
         status: messageSuccess ? 'Sent' : 'Failed'
       };
-
+      
       campaignMessages.push(messageData);
     }
-
-    await campaignMessageQueries.createCampaignMessage(campaignMessages);
-
-    await campaignQueries.updateCampaign(id, { status: 'Completed' });
-
+    
+    await campaignMessageQueries.createCampaignMessages(campaignMessages);
+    
+    
+    
  
 
     res.json({

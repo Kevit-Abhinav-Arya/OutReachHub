@@ -698,48 +698,16 @@ const campaignQueries = {
 //Campaign Message Module
 const campaignMessageQueries = {
 
-  createCampaignMessage: async (messageData) => {
-    const campaignMessage = new CampaignMessage({
+   createCampaignMessages: async (messagesArray) => {
+    console.log("inside bulk create messages............");
+    const messages = messagesArray.map(messageData => ({
       _id: new mongoose.Types.ObjectId(),
       sentAt: new Date(),
       ...messageData
-    });
-    return await campaignMessage.save();
+    }));
+    return await CampaignMessage.insertMany(messages);
   },
 
-
-
-  getCampaignMessages: async (campaignId, workspaceId, page = 1, limit = 10) => {
-    const skip = (page - 1) * limit;
-    return await CampaignMessage.find({
-      campaignId,
-      workspaceId
-    })
-    .sort({ sentAt: -1 })
-    .skip(skip)
-    .limit(limit)
-    .exec();
-  },
-
-  getCampaignMessagesCount: async (campaignId, workspaceId) => {
-    return await CampaignMessage.countDocuments({
-      campaignId,
-      workspaceId
-    });
-  },
-
-  getCampaignMessagesByContact: async (workspaceId, contactId, page = 1, limit = 10) => {
-    const skip = (page - 1) * limit;
-    return await CampaignMessage.find({
-      workspaceId,
-      contactId
-    })
-    .populate('campaignId', 'name')
-    .sort({ sentAt: -1 })
-    .skip(skip)
-    .limit(limit)
-    .exec();
-  }
 };
 
 // ------------------------------------------------------------------
