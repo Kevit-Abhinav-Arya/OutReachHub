@@ -1,5 +1,5 @@
 import mongoose, { Schema, Model } from 'mongoose';
-import { IContact } from '../../types';
+import { IContact } from '../../types/types';
 
 const contactSchema: Schema<IContact> = new mongoose.Schema({
     _id: {

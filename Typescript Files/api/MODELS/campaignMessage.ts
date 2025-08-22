@@ -1,5 +1,5 @@
 import mongoose, { Schema, Model } from 'mongoose';
-import { ICampaignMessage } from '../../types';
+import { ICampaignMessage } from '../../types/types';
 
 const campaignMessageSchema: Schema<ICampaignMessage> = new mongoose.Schema({
     _id: {

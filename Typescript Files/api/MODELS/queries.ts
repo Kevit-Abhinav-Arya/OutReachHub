@@ -18,7 +18,7 @@ import {
   ContactListOptions,
   MessageListOptions,
   CampaignListOptions,
-} from '../../types';
+} from '../../types/types';
 
 // ------------------------------------------------------------------
 // ADMIN PORTAL QUERIES

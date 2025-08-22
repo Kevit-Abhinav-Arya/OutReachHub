@@ -1,5 +1,5 @@
 import mongoose, { Schema, Model } from 'mongoose';
-import { IAuthToken } from '../../types';
+import { IAuthToken } from '../../types/types';
 
 const authTokenSchema: Schema<IAuthToken> = new mongoose.Schema({
     _id: {
