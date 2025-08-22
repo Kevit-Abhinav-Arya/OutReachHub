@@ -109,14 +109,7 @@ export interface IAuthToken extends Document {
   createdAt: Date;
 }
 
-export interface IToken extends Document {
-  _id: ObjectId;
-  userId: ObjectId;
-  token: string;
-  type: 'tempAccess';
-  expiresAt: Date;
-  createdAt: Date;
-}
+
 
 // API responses
 
@@ -169,7 +162,15 @@ export interface JWTPayload {
   };
   role: string;
   type: string;
-  tempAccess?: boolean;
+  iat: number;
+  exp: number;
+}
+
+export interface TempTokenPayload {
+  id: string;
+  email: string;
+  type: 'temp';
+  tempAccess: true;
   iat: number;
   exp: number;
 }
