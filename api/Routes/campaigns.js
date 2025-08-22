@@ -1,5 +1,9 @@
-const express = require('express');
-const { verifyToken, requireViewer, requireEditor } = require('../Middleware/authMiddleware');
+const express = require("express");
+const {
+  verifyToken,
+  requireViewer,
+  requireEditor,
+} = require("../Middleware/authMiddleware");
 const {
   createCampaign,
   getAllCampaigns,
@@ -8,7 +12,7 @@ const {
   deleteCampaign,
   copyCampaign,
   launchCampaign,
-} = require('../Controllers/campaignController');
+} = require("../Controllers/campaignController");
 
 const router = express.Router();
 
@@ -16,14 +20,14 @@ const router = express.Router();
 router.use(verifyToken);
 
 // Campaign CRUD
-router.post('/', requireEditor, createCampaign);
-router.get('/', requireViewer, getAllCampaigns);
-router.get('/:id', requireViewer, getCampaignById);
-router.put('/:id', requireEditor, updateCampaign);
-router.delete('/:id', requireEditor, deleteCampaign);
+router.post("/", requireEditor, createCampaign);
+router.get("/", requireViewer, getAllCampaigns);
+router.get("/:id", requireViewer, getCampaignById);
+router.put("/:id", requireEditor, updateCampaign);
+router.delete("/:id", requireEditor, deleteCampaign);
 
 // Campaign Action
-router.post('/:id/copy', requireEditor, copyCampaign);
-router.post('/:id/launch', requireEditor, launchCampaign);
+router.post("/:id/copy", requireEditor, copyCampaign);
+router.post("/:id/launch", requireEditor, launchCampaign);
 
 module.exports = router;

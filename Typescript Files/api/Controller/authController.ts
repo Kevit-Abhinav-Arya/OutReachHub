@@ -7,7 +7,7 @@ import {
   AuthenticatedRequest,
   JWTPayload,
   TempTokenPayload,
-} from "../../types";
+} from "../../types/types";
 
 // Generate JWT Token
 const generateToken = (payload: Omit<JWTPayload, "iat" | "exp">): string => {

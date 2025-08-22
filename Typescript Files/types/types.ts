@@ -1,7 +1,7 @@
-import { Request } from 'express';
-import { ObjectId, Document } from 'mongoose';
+import { Request } from "express";
+import { ObjectId, Document } from "mongoose";
 
-//Type Safes 
+//Type Safes
 
 export interface AuthenticatedRequest extends Request {
   user?: {
@@ -44,7 +44,7 @@ export interface IUser extends Document {
   workspaces: {
     workspaceId: ObjectId;
     workspaceName: string;
-    role: 'Editor' | 'Viewer';
+    role: "Editor" | "Viewer";
   }[];
   createdAt: Date;
   updatedAt: Date;
@@ -68,7 +68,7 @@ export interface IMessage extends Document {
   _id: ObjectId;
   workspaceId: ObjectId;
   name: string;
-  type: 'Text' | 'Text & Image';
+  type: "Text" | "Text & Image";
   body: string;
   imageUrl?: string;
   createdBy: ObjectId;
@@ -82,7 +82,7 @@ export interface ICampaign extends Document {
   name: string;
   targetTags: string[];
   templateId: ObjectId;
-  status: 'Draft' | 'Running' | 'Completed' | 'Failed';
+  status: "Draft" | "Running" | "Completed" | "Failed";
   createdBy: ObjectId;
   createdAt: Date;
   launchedAt?: Date;
@@ -96,7 +96,7 @@ export interface ICampaignMessage extends Document {
   contactPhoneNumber: string;
   messageBody: string;
   messageImageUrl?: string;
-  status: 'Sent' | 'Failed';
+  status: "Sent" | "Failed";
   sentAt: Date;
 }
 
@@ -104,12 +104,10 @@ export interface IAuthToken extends Document {
   _id: ObjectId;
   userId: ObjectId;
   token: string;
-  type: 'access' | 'refresh';
+  type: "access" | "refresh";
   expiresAt: Date;
   createdAt: Date;
 }
-
-
 
 // API responses
 
@@ -148,7 +146,6 @@ export interface MessageListOptions extends ListOptions {
   type?: string;
 }
 
-
 // JWT Payload
 export interface JWTPayload {
   id: string;
@@ -169,7 +166,7 @@ export interface JWTPayload {
 export interface TempTokenPayload {
   id: string;
   email: string;
-  type: 'temp';
+  type: "temp";
   tempAccess: true;
   iat: number;
   exp: number;
