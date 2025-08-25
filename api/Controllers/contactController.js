@@ -244,13 +244,12 @@ const deleteContact = async (req, res) => {
       return res.status(400).json({ message: "Invalid contact ID" });
     }
 
-    const contact = await contactQueries.getContactById(id, workspaceId);
+    const contact = await contactQueries.deleteContact(id, workspaceId);
 
     if (!contact) {
       return res.status(404).json({ message: "Contact not found" });
     }
 
-    await contactQueries.deleteContact(id, workspaceId);
     res.json({ message: "Contact deleted successfully" });
   } catch (error) {
     console.error("Delete contact error:", error);
