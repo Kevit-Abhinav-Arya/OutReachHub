@@ -10,11 +10,9 @@ const createContact = async (req, res) => {
     console.log(workspaceId);
 
     if (!name || !phoneNumber || !email || !company) {
-      return res
-        .status(400)
-        .json({
-          message: "Name, phone number, email , Company name  are required",
-        });
+      return res.status(400).json({
+        message: "Name, phone number, email , Company name  are required",
+      });
     }
 
     const phoneRegex = /^[6789]\d{9}$/;
