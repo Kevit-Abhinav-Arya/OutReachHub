@@ -27,15 +27,6 @@ export class Token {
 
   @Prop({ default: Date.now })
   createdAt: Date;
-
-  @Prop()
-  lastUsedAt: Date;
-
-  @Prop()
-  userAgent?: string;
-
-  @Prop()
-  ipAddress?: string;
 }
 
 export const TokenSchema = SchemaFactory.createForClass(Token);
