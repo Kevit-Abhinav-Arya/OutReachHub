@@ -1,12 +1,12 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const Admin = require('./admin');
-const User = require('./userModel');
-const Workspace = require('./workspaceModel');
-const Contact = require('./contactModel');
-const Message = require('./messageModel');
-const Campaign = require('./campaignsModel');
-const CampaignMessage = require('./campaignMessage');
+const Admin = require("./admin");
+const User = require("./userModel");
+const Workspace = require("./workspaceModel");
+const Contact = require("./contactModel");
+const Message = require("./messageModel");
+const Campaign = require("./campaignsModel");
+const CampaignMessage = require("./campaignMessage");
 
 // ------------------------------------------------------------------
 // ADMIN PORTAL QUERIES
@@ -22,24 +22,33 @@ const adminQueries = {
   createAdmin: async (adminData) => {
     const admin = new Admin({
       _id: new mongoose.Types.ObjectId(),
-      ...adminData
+      ...adminData,
     });
     return await admin.save();
-  }
+  },
 };
 
 //Workspace Module
 const workspaceQueries = {
-
-  listWorkspaces: async (page = 1, limit = 10) => {
+  listWorkspaces: async (options = {}) => {
+    const { page = 1, limit = 10, search = "" } = options;
     const skip = (page - 1) * limit;
-    return await Workspace.find()
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit)
-      .exec();
-  },
 
+    let query = {};
+    if (search) {
+      query.name = { $regex: search, $options: "i" };
+    }
+    const [workspaces, total] = await Promise.all([
+      Workspace.find(query)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .exec(),
+      Workspace.countDocuments(query),
+    ]);
+
+    return { workspaces, total };
+  },
   getWorkspacesCount: async () => {
     return await Workspace.countDocuments();
   },
@@ -47,7 +56,7 @@ const workspaceQueries = {
   createWorkspace: async (workspaceData) => {
     const workspace = new Workspace({
       _id: new mongoose.Types.ObjectId(),
-      ...workspaceData
+      ...workspaceData,
     });
     return await workspace.save();
   },
@@ -57,48 +66,72 @@ const workspaceQueries = {
   },
 
   updateWorkspace: async (workspaceId, updateData) => {
-    return await Workspace.findByIdAndUpdate(
+    const updatedWorkspace = await Workspace.findByIdAndUpdate(
       workspaceId,
       { ...updateData },
       { new: true }
     );
+
+    if (updateData.name && updatedWorkspace) {
+      await User.updateMany(
+        { "workspaces.workspaceId": workspaceId.toString() },
+        {
+          $set: {
+            "workspaces.$.workspaceName": updateData.name,
+          },
+        }
+      );
+      console.log("user updated");
+    }
+
+    return updatedWorkspace;
   },
 
   // Delete workspace
   deleteWorkspace: async (workspaceId) => {
     return await Workspace.findByIdAndDelete(workspaceId);
-  }
+  },
 };
 
 //Workspace users module
 const workspaceUserQueries = {
   listWorkspaceUsers: async (workspaceId, page = 1, limit = 10) => {
     const skip = (page - 1) * limit;
-    return await User.find({
-      'workspaces.workspaceId': workspaceId
-    })
-    .sort({ createdAt: -1 })
-    .skip(skip)
-    .limit(limit)
-    .exec();
+    const query = { "workspaces.workspaceId": workspaceId };
+
+    const [users, total] = await Promise.all([
+      User.find(query).sort({ createdAt: -1 }).skip(skip).limit(limit).exec(),
+      User.countDocuments(query),
+    ]);
+
+    return { users, total };
   },
 
   getWorkspaceUsersCount: async (workspaceId) => {
     return await User.countDocuments({
-      'workspaces.workspaceId': workspaceId
+      "workspaces.workspaceId": workspaceId,
     });
   },
 
   createWorkspaceUser: async (userData) => {
+    const { workspaceId, role, workspaceName, ...userInfo } = userData;
+
     const user = new User({
       _id: new mongoose.Types.ObjectId(),
-      ...userData
+      ...userInfo,
+      workspaces: [
+        {
+          workspaceId: workspaceId,
+          workspaceName: workspaceName,
+          role: role,
+        },
+      ],
     });
     return await user.save();
   },
 
   getWorkspaceUserById: async (userId) => {
-    return await User.findById(userId).populate('workspaces.workspaceId');
+    return await User.findById(userId).populate("workspaces.workspaceId");
   },
 
   updateWorkspaceUser: async (userId, updateData) => {
@@ -113,13 +146,13 @@ const workspaceUserQueries = {
     return await User.findByIdAndDelete(userId);
   },
 
-  addUserToWorkspace: async (userId, workspaceId, role) => {
+  addUserToWorkspace: async (userId, workspaceId, workspaceName, role) => {
     return await User.findByIdAndUpdate(
       userId,
       {
         $push: {
-          workspaces: { workspaceId, role }
-        }
+          workspaces: { workspaceId, workspaceName, role },
+        },
       },
       { new: true }
     );
@@ -131,12 +164,82 @@ const workspaceUserQueries = {
       userId,
       {
         $pull: {
-          workspaces: { workspaceId }
-        }
+          workspaces: { workspaceId },
+        },
       },
       { new: true }
     );
-  }
+  },
+};
+
+// ------------------------------------------------------------------
+// USER MANAGEMENT QUERIES
+// ------------------------------------------------------------------
+
+const userManagementQueries = {
+  createUser: async (userData) => {
+    const user = new User({
+      _id: new mongoose.Types.ObjectId(),
+      workspaces: [],
+      ...userData,
+    });
+    return await user.save();
+  },
+
+  getAllUsers: async (page = 1, limit = 10) => {
+    const skip = (page - 1) * limit;
+    return await User.find()
+      .populate("workspaces.workspaceId", "name")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .exec();
+  },
+
+  getAllUsersCount: async () => {
+    return await User.countDocuments();
+  },
+
+  getUserById: async (userId) => {
+    return await User.findById(userId).populate(
+      "workspaces.workspaceId",
+      "name"
+    );
+  },
+
+  updateUser: async (userId, updateData) => {
+    return await User.findByIdAndUpdate(
+      userId,
+      { ...updateData },
+      { new: true }
+    ).populate("workspaces.workspaceId", "name");
+  },
+
+  deleteUser: async (userId) => {
+    return await User.findByIdAndDelete(userId);
+  },
+
+  searchUsers: async (searchTerm, page = 1, limit = 10) => {
+    const skip = (page - 1) * limit;
+    return await User.find({
+      $or: [
+        { name: { $regex: searchTerm, $options: "i" } },
+        { email: { $regex: searchTerm, $options: "i" } },
+      ],
+    })
+      .populate("workspaces.workspaceId", "name")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .exec();
+  },
+
+  getUserByEmail: async (email) => {
+    return await User.findOne({ email }).populate(
+      "workspaces.workspaceId",
+      "name"
+    );
+  },
 };
 
 // ------------------------------------------------------------------
@@ -145,20 +248,18 @@ const workspaceUserQueries = {
 
 //User Authentication
 const userAuthQueries = {
-
   findUserByEmail: async (email) => {
-    return await User.findOne({ email }).populate('workspaces.workspaceId');
+    return await User.findOne({ email }).populate("workspaces.workspaceId");
   },
 
   getUserWorkspaces: async (userId) => {
-    return await User.findById(userId).populate('workspaces.workspaceId');
-  }
+    return await User.findById(userId).populate("workspaces.workspaceId");
+  },
 };
 
 //Home module, analytical datas
 //chart data
 const analyticsQueries = {
-
   getCampaignsPerDay: async (workspaceId, startDate, endDate) => {
     return await Campaign.aggregate([
       {
@@ -166,22 +267,22 @@ const analyticsQueries = {
           workspaceId: new mongoose.Types.ObjectId(workspaceId),
           launchedAt: {
             $gte: new Date(startDate),
-            $lte: new Date(endDate)
-          }
-        }
+            $lte: new Date(endDate),
+          },
+        },
       },
       {
         $group: {
           _id: {
             $dateToString: {
               format: "%Y-%m-%d",
-              date: "$launchedAt"
-            }
+              date: "$launchedAt",
+            },
           },
-          count: { $sum: 1 }
-        }
+          count: { $sum: 1 },
+        },
       },
-      { $sort: { "_id": 1 } }
+      { $sort: { _id: 1 } },
     ]);
   },
 
@@ -193,9 +294,9 @@ const analyticsQueries = {
           workspaceId: new mongoose.Types.ObjectId(workspaceId),
           sentAt: {
             $gte: new Date(startDate),
-            $lte: new Date(endDate)
-          }
-        }
+            $lte: new Date(endDate),
+          },
+        },
       },
       {
         $addFields: {
@@ -203,10 +304,10 @@ const analyticsQueries = {
             $cond: {
               if: { $ne: ["$messageImageUrl", null] },
               then: "Text & Image",
-              else: "Text"
-            }
-          }
-        }
+              else: "Text",
+            },
+          },
+        },
       },
       {
         $group: {
@@ -214,15 +315,15 @@ const analyticsQueries = {
             date: {
               $dateToString: {
                 format: "%Y-%m-%d",
-                date: "$sentAt"
-              }
+                date: "$sentAt",
+              },
             },
-            type: "$messageType"
+            type: "$messageType",
           },
-          count: { $sum: 1 }
-        }
+          count: { $sum: 1 },
+        },
       },
-      { $sort: { "_id.date": 1, "_id.type": 1 } }
+      { $sort: { "_id.date": 1, "_id.type": 1 } },
     ]);
   },
 
@@ -234,9 +335,9 @@ const analyticsQueries = {
           workspaceId: new mongoose.Types.ObjectId(workspaceId),
           sentAt: {
             $gte: new Date(startDate),
-            $lte: new Date(endDate)
-          }
-        }
+            $lte: new Date(endDate),
+          },
+        },
       },
       {
         $group: {
@@ -244,20 +345,20 @@ const analyticsQueries = {
             date: {
               $dateToString: {
                 format: "%Y-%m-%d",
-                date: "$sentAt"
-              }
-            }
+                date: "$sentAt",
+              },
+            },
           },
-          uniqueContacts: { $addToSet: "$contactPhoneNumber" }
-        }
+          uniqueContacts: { $addToSet: "$contactPhoneNumber" },
+        },
       },
       {
         $project: {
           _id: 1,
-          count: { $size: "$uniqueContacts" }
-        }
+          count: { $size: "$uniqueContacts" },
+        },
       },
-      { $sort: { "_id": 1 } }
+      { $sort: { _id: 1 } },
     ]);
   },
 
@@ -276,46 +377,63 @@ const analyticsQueries = {
     return await Contact.aggregate([
       {
         $match: {
-          workspaceId: new mongoose.Types.ObjectId(workspaceId)
-        }
+          workspaceId: new mongoose.Types.ObjectId(workspaceId),
+        },
       },
       { $unwind: "$tags" },
       {
         $group: {
           _id: "$tags",
-          contactCount: { $sum: 1 }
-        }
+          contactCount: { $sum: 1 },
+        },
       },
       { $sort: { contactCount: -1 } },
-      { $limit: 5 }
+      { $limit: 5 },
     ]);
-  }
+  },
 };
 //contacts module
 const contactQueries = {
-  listContacts: async (workspaceId, page = 1, limit = 10, tagFilter = null) => {
+  listContacts: async (
+    workspaceId,
+    page = 1,
+    limit = 10,
+    tagFilter = null,
+    search = ""
+  ) => {
     const skip = (page - 1) * limit;
     let query = { workspaceId };
-    
+
     if (tagFilter) {
       query.tags = { $in: [tagFilter] };
     }
 
-    return await Contact.find(query)
-      .populate('createdBy', 'name email')
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit)
-      .exec();
-  },
+    if (search) {
+      query.$or = [
+        { phoneNumber: { $regex: search, $options: "i" } },
+        { email: { $regex: search, $options: "i" } },
+        { name: { $regex: search, $options: "i" } },
+      ];
+    }
 
- 
+    const [contacts, total] = await Promise.all([
+      Contact.find(query)
+        .populate("createdBy", "name email")
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .exec(),
+      Contact.countDocuments(query),
+    ]);
+
+    return { contacts, total };
+  },
 
   createContact: async (contactData) => {
     const contact = new Contact({
       _id: new mongoose.Types.ObjectId(),
       updatedAt: new Date(),
-      ...contactData
+      ...contactData,
     });
     return await contact.save();
   },
@@ -323,8 +441,8 @@ const contactQueries = {
   getContactById: async (contactId, workspaceId) => {
     return await Contact.findOne({
       _id: contactId,
-      workspaceId
-    }).populate('createdBy', 'name email');
+      workspaceId,
+    }).populate("createdBy", "name email");
   },
 
   updateContact: async (contactId, workspaceId, updateData) => {
@@ -338,7 +456,7 @@ const contactQueries = {
   deleteContact: async (contactId, workspaceId) => {
     return await Contact.findOneAndDelete({
       _id: contactId,
-      workspaceId
+      workspaceId,
     });
   },
 
@@ -346,7 +464,7 @@ const contactQueries = {
   getContactsByPhoneNumbers: async (workspaceId, phoneNumbers) => {
     return await Contact.find({
       workspaceId,
-      phoneNumber: { $in: phoneNumbers }
+      phoneNumber: { $in: phoneNumbers },
     });
   },
 
@@ -354,44 +472,42 @@ const contactQueries = {
   getContactsByTags: async (workspaceId, tags) => {
     return await Contact.find({
       workspaceId,
-      tags: { $in: tags }
+      tags: { $in: tags },
     });
   },
 
   // search querry
-  searchContacts: async (workspaceId, searchTerm, page = 1, limit = 10) => {
-    const skip = (page - 1) * limit;
-    return await Contact.find({
-      workspaceId,
-      $or: [
-        { name: { $regex: searchTerm, $options: 'i' } },
-        { phoneNumber: { $regex: searchTerm, $options: 'i' } }
-      ]
-    })
-    .populate('createdBy', 'name email')
-    .sort({ createdAt: -1 })
-    .skip(skip)
-    .limit(limit)
-    .exec();
-  }
 };
 
 //Message template MOdule
 const messageQueries = {
-  listMessages: async (workspaceId, page = 1, limit = 10, typeFilter = null) => {
+  listMessages: async (
+    workspaceId,
+    page = 1,
+    limit = 10,
+    typeFilter = null,
+    search = ""
+  ) => {
     const skip = (page - 1) * limit;
     let query = { workspaceId };
-    
+
     if (typeFilter) {
       query.type = typeFilter;
     }
+    if (search) {
+      query.$or = [{ name: { $regex: search, $options: "i" } }];
+    }
+    const [messages, total] = await Promise.all([
+      Message.find(query)
+        .populate("createdBy", "name email")
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .exec(),
+      Message.countDocuments(query),
+    ]);
 
-    return await Message.find(query)
-      .populate('createdBy', 'name email')
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit)
-      .exec();
+    return { messages, total };
   },
 
   getMessagesCount: async (workspaceId, typeFilter = null) => {
@@ -405,7 +521,7 @@ const messageQueries = {
   createMessage: async (messageData) => {
     const message = new Message({
       _id: new mongoose.Types.ObjectId(),
-      ...messageData
+      ...messageData,
     });
     return await message.save();
   },
@@ -413,8 +529,14 @@ const messageQueries = {
   getMessageById: async (messageId, workspaceId) => {
     return await Message.findOne({
       _id: messageId,
-      workspaceId
-    }).populate('createdBy', 'name email');
+      workspaceId,
+    }).populate("createdBy", "name email");
+  },
+
+  getMessageByName: async (workspaceId, name) => {
+    let query = { workspaceId, name };
+
+    return await Message.findOne(query);
   },
 
   updateMessage: async (messageId, workspaceId, updateData) => {
@@ -428,29 +550,43 @@ const messageQueries = {
   deleteMessage: async (messageId, workspaceId) => {
     return await Message.findOneAndDelete({
       _id: messageId,
-      workspaceId
+      workspaceId,
     });
-  }
+  },
 };
 
 //campaign module
 
 const campaignQueries = {
-  listCampaigns: async (workspaceId, page = 1, limit = 10, statusFilter = null) => {
+  listCampaigns: async (
+    workspaceId,
+    page = 1,
+    limit = 10,
+    statusFilter = null,
+    searchFilter = ""
+  ) => {
     const skip = (page - 1) * limit;
     let query = { workspaceId };
-    
+
     if (statusFilter) {
       query.status = statusFilter;
     }
 
-    return await Campaign.find(query)
-      .populate('templateId', 'name type')
-      .populate('createdBy', 'name email')
+    if (searchFilter && searchFilter.trim()) {
+      query.name = { $regex: searchFilter, $options: "i" };
+    }
+
+    const campaigns = await Campaign.find(query)
+      .populate("templateId", "name type")
+      .populate("createdBy", "name email")
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
       .exec();
+
+    const total = await Campaign.countDocuments(query);
+
+    return { campaigns, total };
   },
 
   getCampaignsCount: async (workspaceId, statusFilter = null) => {
@@ -461,12 +597,11 @@ const campaignQueries = {
     return await Campaign.countDocuments(query);
   },
 
-  
   createCampaign: async (campaignData) => {
     const campaign = new Campaign({
       _id: new mongoose.Types.ObjectId(),
-      status: 'Draft',
-      ...campaignData
+      status: "Draft",
+      ...campaignData,
     });
     return await campaign.save();
   },
@@ -474,20 +609,26 @@ const campaignQueries = {
   getCampaignById: async (campaignId, workspaceId) => {
     return await Campaign.findOne({
       _id: campaignId,
-      workspaceId
+      workspaceId,
     })
-    .populate('templateId')
-    .populate('createdBy', 'name email');
+      .populate("templateId")
+      .populate("createdBy", "name email");
+  },
+
+  getCampaignByName: async (workspaceId, name) => {
+    let query = { workspaceId, name };
+
+    return await Campaign.findOne(query);
   },
 
   //updating campaign only when it is in draft state
 
   updateCampaign: async (campaignId, workspaceId, updateData) => {
     return await Campaign.findOneAndUpdate(
-      { 
-        _id: campaignId, 
+      {
+        _id: campaignId,
         workspaceId,
-        status: 'Draft' 
+        status: "Draft",
       },
       updateData,
       { new: true }
@@ -497,15 +638,15 @@ const campaignQueries = {
   deleteCampaign: async (campaignId, workspaceId) => {
     return await Campaign.findOneAndDelete({
       _id: campaignId,
-      workspaceId
+      workspaceId,
     });
   },
 
-  // Copy campaign 
+  // Copy campaign
   copyCampaign: async (campaignId, workspaceId, newName) => {
     const originalCampaign = await Campaign.findOne({
       _id: campaignId,
-      workspaceId
+      workspaceId,
     });
 
     if (!originalCampaign) return null;
@@ -516,25 +657,25 @@ const campaignQueries = {
       name: newName,
       targetTags: [...originalCampaign.targetTags],
       templateId: originalCampaign.templateId,
-      status: 'Draft',
+      status: "Draft",
       createdBy: originalCampaign.createdBy,
-      createdAt: new Date()
+      createdAt: new Date(),
     });
 
     return await copiedCampaign.save();
   },
 
-  // Launch campaign 
+  // Launch campaign
   launchCampaign: async (campaignId, workspaceId) => {
     return await Campaign.findOneAndUpdate(
-      { 
-        _id: campaignId, 
+      {
+        _id: campaignId,
         workspaceId,
-        status: 'Draft'
+        status: "Draft",
       },
-      { 
-        status: 'Running',
-        launchedAt: new Date()
+      {
+        status: "Running",
+        launchedAt: new Date(),
       },
       { new: true }
     );
@@ -548,76 +689,39 @@ const campaignQueries = {
       { new: true }
     );
   },
-
 };
 
 //Campaign Message Module
 const campaignMessageQueries = {
-
-  createCampaignMessage: async (messageData) => {
-    const campaignMessage = new CampaignMessage({
+  createCampaignMessages: async (messagesArray) => {
+    console.log("inside bulk create messages............");
+    const messages = messagesArray.map((messageData) => ({
       _id: new mongoose.Types.ObjectId(),
       sentAt: new Date(),
-      ...messageData
-    });
-    return await campaignMessage.save();
+      ...messageData,
+    }));
+    return await CampaignMessage.insertMany(messages);
   },
-
-
-
-  getCampaignMessages: async (campaignId, workspaceId, page = 1, limit = 10) => {
-    const skip = (page - 1) * limit;
-    return await CampaignMessage.find({
-      campaignId,
-      workspaceId
-    })
-    .sort({ sentAt: -1 })
-    .skip(skip)
-    .limit(limit)
-    .exec();
-  },
-
-  getCampaignMessagesCount: async (campaignId, workspaceId) => {
-    return await CampaignMessage.countDocuments({
-      campaignId,
-      workspaceId
-    });
-  },
-
-  getCampaignMessagesByContact: async (workspaceId, contactId, page = 1, limit = 10) => {
-    const skip = (page - 1) * limit;
-    return await CampaignMessage.find({
-      workspaceId,
-      contactId
-    })
-    .populate('campaignId', 'name')
-    .sort({ sentAt: -1 })
-    .skip(skip)
-    .limit(limit)
-    .exec();
-  }
 };
 
 // ------------------------------------------------------------------
 // UTILITY QUERIES
 // ------------------------------------------------------------------
 
-
 const utilityQueries = {
-
   // Check if user has access to workspace
   checkUserWorkspaceAccess: async (userId, workspaceId) => {
     const user = await User.findOne({
       _id: userId,
-      'workspaces.workspaceId': workspaceId
+      "workspaces.workspaceId": workspaceId,
     });
-    
+
     if (!user) return null;
-    
+
     const workspace = user.workspaces.find(
-      ws => ws.workspaceId.toString() === workspaceId.toString()
+      (ws) => ws.workspaceId.toString() === workspaceId.toString()
     );
-    
+
     return workspace ? workspace.role : null;
   },
 
@@ -626,25 +730,25 @@ const utilityQueries = {
     return await Contact.aggregate([
       {
         $match: {
-          workspaceId: new mongoose.Types.ObjectId(workspaceId)
-        }
+          workspaceId: new mongoose.Types.ObjectId(workspaceId),
+        },
       },
       { $unwind: "$tags" },
       {
         $group: {
-          _id: "$tags"
-        }
+          _id: "$tags",
+        },
       },
-      { $sort: { "_id": 1 } }
+      { $sort: { _id: 1 } },
     ]);
   },
 
   // Check if phone number exists in workspace
   checkPhoneNumberExists: async (workspaceId, phoneNumber) => {
     let query = { workspaceId, phoneNumber };
-   
+
     return await Contact.findOne(query);
-  }
+  },
 };
 
 module.exports = {
@@ -657,5 +761,6 @@ module.exports = {
   messageQueries,
   campaignQueries,
   campaignMessageQueries,
-  utilityQueries
+  utilityQueries,
+  userManagementQueries,
 };
