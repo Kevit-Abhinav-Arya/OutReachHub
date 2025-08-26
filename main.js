@@ -677,7 +677,8 @@ let ContactsController = class ContactsController {
         return this.contactsService.getAllContacts(queryDto);
     }
     async getContactById(id) {
-        console.log(`Fetching contact with ID: ${id}`);
+        console.log(`Fetching contact with ID: ${id}`)
+     
         return this.contactsService.getContactById(id);
     }
     async createContact(contactData) {
@@ -776,6 +777,7 @@ let ContactsService = class ContactsService {
         if (!contact) {
             throw new common_1.NotFoundException(`Contact with ID ${id} not found`);
         }
+        
         return contact;
     }
     async getAllContacts(queryDto) {

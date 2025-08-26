@@ -311,6 +311,7 @@
 .contact-card:hover {
   transform: translateX(5px);
   box-shadow: 0 4px 20px rgba(0, 180, 216, 0.2), inset 0 0 20px rgba(0, 180, 216, 0.1);
+  border: 0.5px solid rgba(0, 180, 216, 0.7);
 }
 .contact-card .contact-info {
   display: flex;
@@ -764,6 +765,7 @@
   border: 1px solid rgba(231, 224, 224, 0.1);
   background: rgba(35, 34, 50, 0.4);
   color: #e7e0e0;
+  text-transform: capitalize;
   font-size: 1rem;
   transition: all 0.3s ease;
 }

@@ -1,3 +1,4 @@
+
 // API Configuration
 const CONTACTS_API_BASE_URL = "http://localhost:3000";
 const CONTACT_ENDPOINTS = {
@@ -236,7 +237,7 @@ function renderContactsList(contacts) {
     
     contactCard.setAttribute('data-contact-id', contact.id);
     contactCard.querySelector('.contact-avatar').textContent = getInitials(contact.name);
-    contactCard.querySelector('.contact-name').textContent = contact.name;
+    contactCard.querySelector('.contact-name').textContent = contact.name.toUpperCase();
     contactCard.querySelector('.contact-phone span').textContent = ContactUtils.formatPhoneNumber(contact.phoneNumber);
     
     // Handle tags
@@ -287,12 +288,12 @@ async function viewContact(contactId) {
     const contact = await ContactService.getContactById(contactId);
     
     // Updating the view modal with contact data
-    document.querySelector('#viewModal .detail-group:nth-child(1) .value').textContent = contact.name;
+    document.querySelector('#viewModal .detail-group:nth-child(1) .value').textContent = contact.name.toUpperCase();
     document.querySelector('#viewModal .detail-group:nth-child(2) .value').textContent = ContactUtils.formatPhoneNumber(contact.phoneNumber);
     
     // Updating tags
     const tagsContainer = document.querySelector('#viewModal .tags-list');
-    if (contact.tags && contact.tags.length > 0) {
+    if (contact.tags && contact.tags.length > 0) {  
       tagsContainer.innerHTML = contact.tags.map(tag => 
         `<span class="tag">${(tag)}</span>`
       ).join('');
@@ -644,12 +645,14 @@ function toggleTagFilter() {
 
 
 
+//--------------------------------------------------------------------------------
+// Notification logic
+//--------------------------------------------------------------------------------
 
 function safeShowNotification(message, type = 'info') {
   if (typeof showNotification === 'function') {
     showNotification(message, type);
   } else {
-    // Fallback notification
     console.log(`${type.toUpperCase()}: ${message}`);
     alert(`${type.toUpperCase()}: ${message}`);
   }
