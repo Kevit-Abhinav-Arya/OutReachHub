@@ -1,25 +1,37 @@
-const mongoose = require("mongoose");
-
-const Admin = require("./admin");
-const User = require("./userModel");
-const Workspace = require("./workspaceModel");
-const Contact = require("./contactModel");
-const Message = require("./messageModel");
-const Campaign = require("./campaignsModel");
-const CampaignMessage = require("./campaignMessage");
+import mongoose from "mongoose";
+import Admin from "./admin";
+import User from "./userModel";
+import Workspace from "./workspaceModel";
+import Contact from "./contactModel";
+import Message from "./messageModel";
+import Campaign from "./campaignsModel";
+import CampaignMessage from "./campaignMessage";
+import {
+  IAdmin,
+  IUser,
+  IWorkspace,
+  IContact,
+  IMessage,
+  ICampaign,
+  ICampaignMessage,
+  ListOptions,
+  ContactListOptions,
+  MessageListOptions,
+  CampaignListOptions,
+} from "../../types/types";
 
 // ------------------------------------------------------------------
 // ADMIN PORTAL QUERIES
 // ------------------------------------------------------------------
 
-//Admin Authentication
-const adminQueries = {
-  findAdminByEmail: async (email) => {
+// Admin Authentication
+export const adminQueries = {
+  findAdminByEmail: async (email: string): Promise<IAdmin | null> => {
     return await Admin.findOne({ email });
   },
 
   // Create new admin just to add an admin at first place
-  createAdmin: async (adminData) => {
+  createAdmin: async (adminData: Partial<IAdmin>): Promise<IAdmin> => {
     const admin = new Admin({
       _id: new mongoose.Types.ObjectId(),
       ...adminData,
@@ -28,16 +40,19 @@ const adminQueries = {
   },
 };
 
-//Workspace Module
-const workspaceQueries = {
-  listWorkspaces: async (options = {}) => {
+// Workspace Module
+export const workspaceQueries = {
+  listWorkspaces: async (
+    options: ListOptions
+  ): Promise<{ workspaces: IWorkspace[]; total: number }> => {
     const { page = 1, limit = 10, search = "" } = options;
     const skip = (page - 1) * limit;
 
-    let query = {};
+    let query: any = {};
     if (search) {
       query.name = { $regex: search, $options: "i" };
     }
+
     const [workspaces, total] = await Promise.all([
       Workspace.find(query)
         .sort({ createdAt: -1 })
@@ -49,11 +64,14 @@ const workspaceQueries = {
 
     return { workspaces, total };
   },
-  getWorkspacesCount: async () => {
+
+  getWorkspacesCount: async (): Promise<number> => {
     return await Workspace.countDocuments();
   },
 
-  createWorkspace: async (workspaceData) => {
+  createWorkspace: async (
+    workspaceData: Partial<IWorkspace>
+  ): Promise<IWorkspace> => {
     const workspace = new Workspace({
       _id: new mongoose.Types.ObjectId(),
       ...workspaceData,
@@ -61,11 +79,14 @@ const workspaceQueries = {
     return await workspace.save();
   },
 
-  getWorkspaceById: async (workspaceId) => {
+  getWorkspaceById: async (workspaceId: string): Promise<IWorkspace | null> => {
     return await Workspace.findById(workspaceId);
   },
 
-  updateWorkspace: async (workspaceId, updateData) => {
+  updateWorkspace: async (
+    workspaceId: string,
+    updateData: Partial<IWorkspace>
+  ): Promise<IWorkspace | null> => {
     const updatedWorkspace = await Workspace.findByIdAndUpdate(
       workspaceId,
       { ...updateData },
@@ -74,28 +95,36 @@ const workspaceQueries = {
 
     if (updateData.name && updatedWorkspace) {
       await User.updateMany(
-        { "workspaces.workspaceId": workspaceId.toString() },
+        {
+          $or: [
+            { "workspaces.workspaceId": workspaceId },
+            { "workspaces.workspaceId": workspaceId.toString() },
+          ],
+        },
         {
           $set: {
             "workspaces.$.workspaceName": updateData.name,
           },
         }
       );
-      console.log("user updated");
     }
 
     return updatedWorkspace;
   },
 
   // Delete workspace
-  deleteWorkspace: async (workspaceId) => {
+  deleteWorkspace: async (workspaceId: string): Promise<IWorkspace | null> => {
     return await Workspace.findByIdAndDelete(workspaceId);
   },
 };
 
-//Workspace users module
-const workspaceUserQueries = {
-  listWorkspaceUsers: async (workspaceId, page = 1, limit = 10) => {
+// Workspace users module
+export const workspaceUserQueries = {
+  listWorkspaceUsers: async (
+    workspaceId: string,
+    page: number = 1,
+    limit: number = 10
+  ): Promise<{ users: IUser[]; total: number }> => {
     const skip = (page - 1) * limit;
     const query = { "workspaces.workspaceId": workspaceId };
 
@@ -107,13 +136,19 @@ const workspaceUserQueries = {
     return { users, total };
   },
 
-  getWorkspaceUsersCount: async (workspaceId) => {
+  getWorkspaceUsersCount: async (workspaceId: string): Promise<number> => {
     return await User.countDocuments({
       "workspaces.workspaceId": workspaceId,
     });
   },
 
-  createWorkspaceUser: async (userData) => {
+  createWorkspaceUser: async (
+    userData: {
+      workspaceId: string;
+      role: string;
+      workspaceName: string;
+    } & Omit<IUser, "_id">
+  ): Promise<IUser> => {
     const { workspaceId, role, workspaceName, ...userInfo } = userData;
 
     const user = new User({
@@ -130,23 +165,44 @@ const workspaceUserQueries = {
     return await user.save();
   },
 
-  getWorkspaceUserById: async (userId) => {
+  getWorkspaceUserById: async (userId: string): Promise<IUser | null> => {
     return await User.findById(userId).populate("workspaces.workspaceId");
   },
 
-  updateWorkspaceUser: async (userId, updateData) => {
-    return await User.findByIdAndUpdate(
-      userId,
-      { ...updateData },
+  updateWorkspaceUser: async (
+    userId: string,
+    workspaceId: string,
+    updateData: Partial<IUser & { role?: string }>
+  ): Promise<IUser | null> => {
+    const updateFields: any = {};
+
+    if (updateData.name) updateFields.name = updateData.name;
+    if (updateData.email) updateFields.email = updateData.email;
+
+    if (updateData.role) {
+      updateFields["workspaces.$.role"] = updateData.role;
+    }
+
+    return await User.findOneAndUpdate(
+      {
+        _id: userId,
+        "workspaces.workspaceId": workspaceId,
+      },
+      { $set: updateFields },
       { new: true }
-    );
+    ).populate("workspaces.workspaceId");
   },
 
-  deleteWorkspaceUser: async (userId) => {
+  deleteWorkspaceUser: async (userId: string): Promise<IUser | null> => {
     return await User.findByIdAndDelete(userId);
   },
 
-  addUserToWorkspace: async (userId, workspaceId, workspaceName, role) => {
+  addUserToWorkspace: async (
+    userId: string,
+    workspaceId: string,
+    workspaceName: string,
+    role: string
+  ): Promise<IUser | null> => {
     return await User.findByIdAndUpdate(
       userId,
       {
@@ -159,7 +215,10 @@ const workspaceUserQueries = {
   },
 
   // Remove user from workspace
-  removeUserFromWorkspace: async (userId, workspaceId) => {
+  removeUserFromWorkspace: async (
+    userId: string,
+    workspaceId: string
+  ): Promise<IUser | null> => {
     return await User.findByIdAndUpdate(
       userId,
       {
@@ -176,8 +235,8 @@ const workspaceUserQueries = {
 // USER MANAGEMENT QUERIES
 // ------------------------------------------------------------------
 
-const userManagementQueries = {
-  createUser: async (userData) => {
+export const userManagementQueries = {
+  createUser: async (userData: Partial<IUser>): Promise<IUser> => {
     const user = new User({
       _id: new mongoose.Types.ObjectId(),
       workspaces: [],
@@ -186,7 +245,10 @@ const userManagementQueries = {
     return await user.save();
   },
 
-  getAllUsers: async (page = 1, limit = 10) => {
+  getAllUsers: async (
+    page: number = 1,
+    limit: number = 10
+  ): Promise<IUser[]> => {
     const skip = (page - 1) * limit;
     return await User.find()
       .populate("workspaces.workspaceId", "name")
@@ -196,18 +258,21 @@ const userManagementQueries = {
       .exec();
   },
 
-  getAllUsersCount: async () => {
+  getAllUsersCount: async (): Promise<number> => {
     return await User.countDocuments();
   },
 
-  getUserById: async (userId) => {
+  getUserById: async (userId: string): Promise<IUser | null> => {
     return await User.findById(userId).populate(
       "workspaces.workspaceId",
       "name"
     );
   },
 
-  updateUser: async (userId, updateData) => {
+  updateUser: async (
+    userId: string,
+    updateData: Partial<IUser>
+  ): Promise<IUser | null> => {
     return await User.findByIdAndUpdate(
       userId,
       { ...updateData },
@@ -215,11 +280,15 @@ const userManagementQueries = {
     ).populate("workspaces.workspaceId", "name");
   },
 
-  deleteUser: async (userId) => {
+  deleteUser: async (userId: string): Promise<IUser | null> => {
     return await User.findByIdAndDelete(userId);
   },
 
-  searchUsers: async (searchTerm, page = 1, limit = 10) => {
+  searchUsers: async (
+    searchTerm: string,
+    page: number = 1,
+    limit: number = 10
+  ): Promise<IUser[]> => {
     const skip = (page - 1) * limit;
     return await User.find({
       $or: [
@@ -234,7 +303,7 @@ const userManagementQueries = {
       .exec();
   },
 
-  getUserByEmail: async (email) => {
+  getUserByEmail: async (email: string): Promise<IUser | null> => {
     return await User.findOne({ email }).populate(
       "workspaces.workspaceId",
       "name"
@@ -246,21 +315,26 @@ const userManagementQueries = {
 // OUTREACHHUB PORTAL QUERIES
 // ------------------------------------------------------------------
 
-//User Authentication
-const userAuthQueries = {
-  findUserByEmail: async (email) => {
+// User Authentication
+export const userAuthQueries = {
+  findUserByEmail: async (email: string): Promise<IUser | null> => {
     return await User.findOne({ email }).populate("workspaces.workspaceId");
   },
 
-  getUserWorkspaces: async (userId) => {
+  getUserWorkspaces: async (userId: string): Promise<IUser | null> => {
     return await User.findById(userId).populate("workspaces.workspaceId");
   },
 };
 
 //Home module, analytical datas
+
 //chart data
-const analyticsQueries = {
-  getCampaignsPerDay: async (workspaceId, startDate, endDate) => {
+export const analyticsQueries = {
+  getCampaignsPerDay: async (
+    workspaceId: string,
+    startDate: string,
+    endDate: string
+  ): Promise<any[]> => {
     return await Campaign.aggregate([
       {
         $match: {
@@ -286,8 +360,12 @@ const analyticsQueries = {
     ]);
   },
 
-  // Getting message sent pertype per day
-  getMessagesSentPerTypePerDay: async (workspaceId, startDate, endDate) => {
+  // Getting message sent per type per day
+  getMessagesSentPerTypePerDay: async (
+    workspaceId: string,
+    startDate: string,
+    endDate: string
+  ): Promise<any[]> => {
     return await CampaignMessage.aggregate([
       {
         $match: {
@@ -327,8 +405,12 @@ const analyticsQueries = {
     ]);
   },
 
-  //Number of contacts reached per day
-  getContactsReachedPerDay: async (workspaceId, startDate, endDate) => {
+  // Number of contacts reached per day
+  getContactsReachedPerDay: async (
+    workspaceId: string,
+    startDate: string,
+    endDate: string
+  ): Promise<any[]> => {
     return await CampaignMessage.aggregate([
       {
         $match: {
@@ -363,17 +445,16 @@ const analyticsQueries = {
   },
 
   // Table Data
-
-  //list of 5 recent campaigns
-  getRecentCampaigns: async (workspaceId) => {
+  // list of 5 recent campaigns
+  getRecentCampaigns: async (workspaceId: string): Promise<ICampaign[]> => {
     return await Campaign.find({ workspaceId })
       .sort({ createdAt: -1 })
       .limit(5)
       .exec();
   },
 
-  //list of top 5 tags with most contacts
-  getTopContactTags: async (workspaceId) => {
+  // list of top 5 tags with most contacts
+  getTopContactTags: async (workspaceId: string): Promise<any[]> => {
     return await Contact.aggregate([
       {
         $match: {
@@ -392,20 +473,19 @@ const analyticsQueries = {
     ]);
   },
 };
-//contacts module
-const contactQueries = {
-  listContacts: async (
-    workspaceId,
-    page = 1,
-    limit = 10,
-    tagFilter = null,
-    search = ""
-  ) => {
-    const skip = (page - 1) * limit;
-    let query = { workspaceId };
 
-    if (tagFilter) {
-      query.tags = { $in: [tagFilter] };
+// contacts module
+export const contactQueries = {
+  listContacts: async (
+    workspaceId: string,
+    options: ContactListOptions
+  ): Promise<{ contacts: IContact[]; total: number }> => {
+    const { page = 1, limit = 10, tags = [], search = "" } = options;
+    const skip = (page - 1) * limit;
+    let query: any = { workspaceId };
+
+    if (tags.length > 0) {
+      query.tags = { $in: tags };
     }
 
     if (search) {
@@ -429,7 +509,7 @@ const contactQueries = {
     return { contacts, total };
   },
 
-  createContact: async (contactData) => {
+  createContact: async (contactData: Partial<IContact>): Promise<IContact> => {
     const contact = new Contact({
       _id: new mongoose.Types.ObjectId(),
       updatedAt: new Date(),
@@ -438,14 +518,21 @@ const contactQueries = {
     return await contact.save();
   },
 
-  getContactById: async (contactId, workspaceId) => {
+  getContactById: async (
+    contactId: string,
+    workspaceId: string
+  ): Promise<IContact | null> => {
     return await Contact.findOne({
       _id: contactId,
       workspaceId,
     }).populate("createdBy", "name email");
   },
 
-  updateContact: async (contactId, workspaceId, updateData) => {
+  updateContact: async (
+    contactId: string,
+    workspaceId: string,
+    updateData: Partial<IContact>
+  ): Promise<IContact | null> => {
     return await Contact.findOneAndUpdate(
       { _id: contactId, workspaceId },
       { ...updateData, updatedAt: new Date() },
@@ -453,50 +540,76 @@ const contactQueries = {
     );
   },
 
-  deleteContact: async (contactId, workspaceId) => {
+  deleteContact: async (
+    contactId: string,
+    workspaceId: string
+  ): Promise<IContact | null> => {
     return await Contact.findOneAndDelete({
       _id: contactId,
       workspaceId,
     });
   },
 
-  // get contacts by phone number for campaigns
-  getContactsByPhoneNumbers: async (workspaceId, phoneNumbers) => {
+  getContactsByPhoneNumbers: async (
+    workspaceId: string,
+    phoneNumbers: string[]
+  ): Promise<IContact[]> => {
     return await Contact.find({
       workspaceId,
       phoneNumber: { $in: phoneNumbers },
     });
   },
 
-  // get contacts by tags for campaigns
-  getContactsByTags: async (workspaceId, tags) => {
+  getContactsByTags: async (
+    workspaceId: string,
+    tags: string[]
+  ): Promise<IContact[]> => {
     return await Contact.find({
       workspaceId,
       tags: { $in: tags },
     });
   },
 
-  // search querry
+  searchContacts: async (
+    workspaceId: string,
+    searchTerm: string,
+    page: number = 1,
+    limit: number = 10
+  ): Promise<IContact[]> => {
+    const skip = (page - 1) * limit;
+    return await Contact.find({
+      workspaceId,
+      $or: [
+        { name: { $regex: searchTerm, $options: "i" } },
+        { phoneNumber: { $regex: searchTerm, $options: "i" } },
+      ],
+    })
+      .populate("createdBy", "name email")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .exec();
+  },
 };
 
-//Message template MOdule
-const messageQueries = {
+// Message template Module
+export const messageQueries = {
   listMessages: async (
-    workspaceId,
-    page = 1,
-    limit = 10,
-    typeFilter = null,
-    search = ""
-  ) => {
+    workspaceId: string,
+    options: MessageListOptions
+  ): Promise<{ messages: IMessage[]; total: number }> => {
+    const { page = 1, limit = 10, type, search = "" } = options;
     const skip = (page - 1) * limit;
-    let query = { workspaceId };
+    let query: any = { workspaceId };
 
-    if (typeFilter) {
-      query.type = typeFilter;
+    if (type) {
+      query.type = type;
     }
+
     if (search) {
-      query.$or = [{ name: { $regex: search, $options: "i" } }];
+      query.name = { $regex: search, $options: "i" };
     }
+
     const [messages, total] = await Promise.all([
       Message.find(query)
         .populate("createdBy", "name email")
@@ -510,15 +623,18 @@ const messageQueries = {
     return { messages, total };
   },
 
-  getMessagesCount: async (workspaceId, typeFilter = null) => {
-    let query = { workspaceId };
+  getMessagesCount: async (
+    workspaceId: string,
+    typeFilter?: string
+  ): Promise<number> => {
+    let query: any = { workspaceId };
     if (typeFilter) {
       query.type = typeFilter;
     }
     return await Message.countDocuments(query);
   },
 
-  createMessage: async (messageData) => {
+  createMessage: async (messageData: Partial<IMessage>): Promise<IMessage> => {
     const message = new Message({
       _id: new mongoose.Types.ObjectId(),
       ...messageData,
@@ -526,20 +642,29 @@ const messageQueries = {
     return await message.save();
   },
 
-  getMessageById: async (messageId, workspaceId) => {
+  getMessageById: async (
+    messageId: string,
+    workspaceId: string
+  ): Promise<IMessage | null> => {
     return await Message.findOne({
       _id: messageId,
       workspaceId,
     }).populate("createdBy", "name email");
   },
 
-  getMessageByName: async (workspaceId, name) => {
-    let query = { workspaceId, name };
-
+  getMessageByName: async (
+    workspaceId: string,
+    name: string
+  ): Promise<IMessage | null> => {
+    let query: any = { workspaceId, name };
     return await Message.findOne(query);
   },
 
-  updateMessage: async (messageId, workspaceId, updateData) => {
+  updateMessage: async (
+    messageId: string,
+    workspaceId: string,
+    updateData: Partial<IMessage>
+  ): Promise<IMessage | null> => {
     return await Message.findOneAndUpdate(
       { _id: messageId, workspaceId },
       updateData,
@@ -547,7 +672,10 @@ const messageQueries = {
     );
   },
 
-  deleteMessage: async (messageId, workspaceId) => {
+  deleteMessage: async (
+    messageId: string,
+    workspaceId: string
+  ): Promise<IMessage | null> => {
     return await Message.findOneAndDelete({
       _id: messageId,
       workspaceId,
@@ -555,25 +683,22 @@ const messageQueries = {
   },
 };
 
-//campaign module
-
-const campaignQueries = {
+// campaign module
+export const campaignQueries = {
   listCampaigns: async (
-    workspaceId,
-    page = 1,
-    limit = 10,
-    statusFilter = null,
-    searchFilter = ""
-  ) => {
+    workspaceId: string,
+    options: CampaignListOptions
+  ): Promise<{ campaigns: ICampaign[]; total: number }> => {
+    const { page = 1, limit = 10, status, search = "" } = options;
     const skip = (page - 1) * limit;
-    let query = { workspaceId };
+    let query: any = { workspaceId };
 
-    if (statusFilter) {
-      query.status = statusFilter;
+    if (status) {
+      query.status = status;
     }
 
-    if (searchFilter && searchFilter.trim()) {
-      query.name = { $regex: searchFilter, $options: "i" };
+    if (search && search.trim()) {
+      query.name = { $regex: search, $options: "i" };
     }
 
     const campaigns = await Campaign.find(query)
@@ -589,15 +714,9 @@ const campaignQueries = {
     return { campaigns, total };
   },
 
-  getCampaignsCount: async (workspaceId, statusFilter = null) => {
-    let query = { workspaceId };
-    if (statusFilter) {
-      query.status = statusFilter;
-    }
-    return await Campaign.countDocuments(query);
-  },
-
-  createCampaign: async (campaignData) => {
+  createCampaign: async (
+    campaignData: Partial<ICampaign>
+  ): Promise<ICampaign> => {
     const campaign = new Campaign({
       _id: new mongoose.Types.ObjectId(),
       status: "Draft",
@@ -606,7 +725,10 @@ const campaignQueries = {
     return await campaign.save();
   },
 
-  getCampaignById: async (campaignId, workspaceId) => {
+  getCampaignById: async (
+    campaignId: string,
+    workspaceId: string
+  ): Promise<ICampaign | null> => {
     return await Campaign.findOne({
       _id: campaignId,
       workspaceId,
@@ -615,15 +737,20 @@ const campaignQueries = {
       .populate("createdBy", "name email");
   },
 
-  getCampaignByName: async (workspaceId, name) => {
-    let query = { workspaceId, name };
-
+  getCampaignByName: async (
+    workspaceId: string,
+    name: string
+  ): Promise<ICampaign | null> => {
+    let query: any = { workspaceId, name };
     return await Campaign.findOne(query);
   },
 
-  //updating campaign only when it is in draft state
-
-  updateCampaign: async (campaignId, workspaceId, updateData) => {
+  // updating campaign only when it is in draft state
+  updateCampaign: async (
+    campaignId: string,
+    workspaceId: string,
+    updateData: Partial<ICampaign>
+  ): Promise<ICampaign | null> => {
     return await Campaign.findOneAndUpdate(
       {
         _id: campaignId,
@@ -635,7 +762,10 @@ const campaignQueries = {
     );
   },
 
-  deleteCampaign: async (campaignId, workspaceId) => {
+  deleteCampaign: async (
+    campaignId: string,
+    workspaceId: string
+  ): Promise<ICampaign | null> => {
     return await Campaign.findOneAndDelete({
       _id: campaignId,
       workspaceId,
@@ -643,7 +773,11 @@ const campaignQueries = {
   },
 
   // Copy campaign
-  copyCampaign: async (campaignId, workspaceId, newName) => {
+  copyCampaign: async (
+    campaignId: string,
+    workspaceId: string,
+    newName: string
+  ): Promise<ICampaign | null> => {
     const originalCampaign = await Campaign.findOne({
       _id: campaignId,
       workspaceId,
@@ -651,7 +785,7 @@ const campaignQueries = {
 
     if (!originalCampaign) return null;
 
-    const copiedCampaign = new Campaign({
+    const copiedCampaign: ICampaign = new Campaign({
       _id: new mongoose.Types.ObjectId(),
       workspaceId: originalCampaign.workspaceId,
       name: newName,
@@ -666,7 +800,10 @@ const campaignQueries = {
   },
 
   // Launch campaign
-  launchCampaign: async (campaignId, workspaceId) => {
+  launchCampaign: async (
+    campaignId: string,
+    workspaceId: string
+  ): Promise<ICampaign | null> => {
     return await Campaign.findOneAndUpdate(
       {
         _id: campaignId,
@@ -682,51 +819,96 @@ const campaignQueries = {
   },
 
   // Update campaign status
-  updateCampaignStatus: async (campaignId, status) => {
+  updateCampaignStatus: async (
+    campaignId: string,
+    status: string
+  ): Promise<ICampaign | null> => {
     return await Campaign.findByIdAndUpdate(
       campaignId,
       { status },
       { new: true }
     );
   },
+
+  getCampaignStats: async (
+    campaignId: string,
+    workspaceId: string
+  ): Promise<{ total: number; sent: number; failed: number }> => {
+    const stats = await CampaignMessage.aggregate([
+      {
+        $match: {
+          campaignId: new mongoose.Types.ObjectId(campaignId),
+          workspaceId: new mongoose.Types.ObjectId(workspaceId),
+        },
+      },
+      {
+        $group: {
+          _id: "$status",
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
+    const result = {
+      total: 0,
+      sent: 0,
+      failed: 0,
+    };
+
+    stats.forEach((stat: any) => {
+      result.total += stat.count;
+      if (stat._id === "Sent") {
+        result.sent = stat.count;
+      } else if (stat._id === "Failed") {
+        result.failed = stat.count;
+      }
+    });
+
+    return result;
+  },
 };
 
-//Campaign Message Module
-const campaignMessageQueries = {
-  createCampaignMessages: async (messagesArray) => {
+// Campaign Message Module
+export const campaignMessageQueries = {
+  createCampaignMessages: async (
+    messagesArray: Partial<ICampaignMessage>[]
+  ): Promise<ICampaignMessage[]> => {
     console.log("inside bulk create messages............");
-    const messages = messagesArray.map((messageData) => ({
+    console.log(messagesArray);
+    const messagesWithDefaults = messagesArray.map((messageData) => ({
       _id: new mongoose.Types.ObjectId(),
       sentAt: new Date(),
       ...messageData,
     }));
-    return await CampaignMessage.insertMany(messages);
+    const result = await CampaignMessage.insertMany(messagesWithDefaults);
+    return result as ICampaignMessage[];
+  },
+
+  getCampaignMessages: async (
+    campaignId: string,
+    workspaceId: string,
+    page: number = 1,
+    limit: number = 10
+  ): Promise<ICampaignMessage[]> => {
+    const skip = (page - 1) * limit;
+    return await CampaignMessage.find({
+      campaignId,
+      workspaceId,
+    })
+      .populate("contactId")
+      .sort({ sentAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .exec();
   },
 };
 
 // ------------------------------------------------------------------
 // UTILITY QUERIES
 // ------------------------------------------------------------------
-
-const utilityQueries = {
-  // Check if user has access to workspace
-  checkUserWorkspaceAccess: async (userId, workspaceId) => {
-    const user = await User.findOne({
-      _id: userId,
-      "workspaces.workspaceId": workspaceId,
-    });
-
-    if (!user) return null;
-
-    const workspace = user.workspaces.find(
-      (ws) => ws.workspaceId.toString() === workspaceId.toString()
-    );
-
-    return workspace ? workspace.role : null;
-  },
-
+export const utilityQueries = {
   // gives all the tags in the workspace
-  getWorkspaceTags: async (workspaceId) => {
+  getWorkspaceTags: async (workspaceId: string): Promise<any[]> => {
     return await Contact.aggregate([
       {
         $match: {
@@ -744,23 +926,11 @@ const utilityQueries = {
   },
 
   // Check if phone number exists in workspace
-  checkPhoneNumberExists: async (workspaceId, phoneNumber) => {
-    let query = { workspaceId, phoneNumber };
-
+  checkPhoneNumberExists: async (
+    workspaceId: string,
+    phoneNumber: string
+  ): Promise<IContact | null> => {
+    let query: any = { workspaceId, phoneNumber };
     return await Contact.findOne(query);
   },
-};
-
-module.exports = {
-  adminQueries,
-  workspaceQueries,
-  workspaceUserQueries,
-  userAuthQueries,
-  analyticsQueries,
-  contactQueries,
-  messageQueries,
-  campaignQueries,
-  campaignMessageQueries,
-  utilityQueries,
-  userManagementQueries,
 };
