@@ -12,6 +12,7 @@ import { MessageTemplatesModule } from './message-templates/message-templates.mo
 import { CampaignsModule } from './campaigns/campaigns.module';
 import { AnalyticsModule } from './analytics/analytics.module';
 import { DatabaseModule } from './database/database.module';
+import { CommonModule } from './common/common.module';
 
 // Filters
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
@@ -27,6 +28,7 @@ import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 
     // Feature Modules
     DatabaseModule,
+    CommonModule,
     AuthModule,
     WorkspacesModule,
     UsersModule,
