@@ -278,10 +278,6 @@ export class QueriesService {
       .populate('workspaces.workspaceId', 'name');
   }
 
-  // ------------------------------------------------------------------
-  // OUTREACHHUB PORTAL QUERIES
-  // ------------------------------------------------------------------
-
   // User Authentication
   async findUserByEmail(email: string) {
     return await this.userModel.findOne({ email }).exec();
@@ -292,6 +288,18 @@ export class QueriesService {
       .findById(userId)
       .populate('workspaces.workspaceId');
   }
+  async getUsersNotInWorkspace(workspaceId: string) {
+    return await this.userModel
+      .find({
+        'workspaces.workspaceId': { $ne: workspaceId },
+      })
+      .select('_id name email')
+      .exec();
+  }
+
+  // ------------------------------------------------------------------
+  // OUTREACHHUB PORTAL QUERIES
+  // ------------------------------------------------------------------
 
   // ------------------------------------------------------------------
   // ANALYTICS QUERIES
