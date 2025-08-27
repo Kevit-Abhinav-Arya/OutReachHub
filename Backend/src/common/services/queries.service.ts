@@ -587,11 +587,12 @@ export class QueriesService {
   }
 
   async updateMessage(messageId: string, workspaceId: string, updateData: any) {
-    return await this.messageModel.findOneAndUpdate(
-      { _id: messageId, workspaceId },
-      updateData,
-      { new: true },
-    );
+    return await this.messageModel
+      .findOneAndUpdate({ _id: messageId, workspaceId }, updateData, {
+        new: true,
+      })
+      .populate('createdBy', 'name email')
+      .exec();
   }
 
   async deleteMessage(messageId: string, workspaceId: string) {
