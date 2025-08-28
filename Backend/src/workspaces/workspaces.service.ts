@@ -32,6 +32,12 @@ export class WorkspacesService {
     const workspaceData = {
       name: createWorkspaceDto.name.trim(),
     };
+    const existingWorkspace = await this.queriesService.getWorkspaceByName(
+      createWorkspaceDto.name,
+    );
+
+    if (existingWorkspace)
+      throw new ConflictException('Workspace with this name already exists');
 
     const workspace = await this.queriesService.createWorkspace(workspaceData);
 
@@ -118,6 +124,15 @@ export class WorkspacesService {
     if (!Types.ObjectId.isValid(id)) {
       throw new BadRequestException('Invalid workspace ID');
     }
+    let existingWorkspace: any;
+    if (updateWorkspaceDto.name != undefined) {
+      existingWorkspace = await this.queriesService.getWorkspaceByName(
+        updateWorkspaceDto.name,
+      );
+    }
+
+    if (existingWorkspace)
+      throw new ConflictException('Workspace with this name already exists');
 
     const updateData = {
       ...(updateWorkspaceDto.name && { name: updateWorkspaceDto.name.trim() }),

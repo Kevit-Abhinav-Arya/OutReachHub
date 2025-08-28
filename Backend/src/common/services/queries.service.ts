@@ -96,6 +96,9 @@ export class QueriesService {
   async getWorkspaceById(workspaceId: string) {
     return await this.workspaceModel.findById(workspaceId);
   }
+  async getWorkspaceByName(workspaceName: string) {
+    return await this.workspaceModel.findOne({ name: workspaceName });
+  }
 
   async updateWorkspace(workspaceId: string, updateData: any) {
     const updatedWorkspace = await this.workspaceModel.findByIdAndUpdate(

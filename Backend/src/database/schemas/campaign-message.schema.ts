@@ -16,8 +16,8 @@ export class CampaignMessage {
   @Prop({ type: Types.ObjectId, ref: 'Contact' })
   contactId: Types.ObjectId;
 
-  @Prop({ required: true })
-  contactPhoneNumber: string;
+  @Prop({ type: [String], required: true })
+  contactPhoneNumber: string[];
 
   @Prop({ required: true })
   messageBody: string;
