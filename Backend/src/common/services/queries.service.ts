@@ -746,6 +746,17 @@ export class QueriesService {
     }));
     return await this.campaignMessageModel.insertMany(messages);
   }
+  async getCampaignMessages(
+    campaignId: string,
+    options: { limit?: number; skip?: number } = {},
+  ) {
+    const { limit = 10, skip = 0 } = options;
+    return await this.campaignMessageModel
+      .find({ campaignId })
+      .skip(skip)
+      .limit(limit)
+      .exec();
+  }
 
   // ------------------------------------------------------------------
   // UTILITY QUERIES
