@@ -20,7 +20,6 @@ import {
   DeleteCampaignResponse,
   CampaignResponseDto,
   CampaignMessageDto,
-  CampaignSummaryDto,
 } from './dto';
 
 @Injectable()
