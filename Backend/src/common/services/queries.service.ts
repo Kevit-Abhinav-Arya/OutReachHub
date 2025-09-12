@@ -307,16 +307,26 @@ export class QueriesService {
   // ------------------------------------------------------------------
   // ANALYTICS QUERIES
   // ------------------------------------------------------------------
-
   async getCampaignsPerDay(
     workspaceId: string,
     startDate: Date,
     endDate: Date,
   ) {
+    const workspaceObjectId = new Types.ObjectId(workspaceId);
+
+    const campaignsAsObjectId = await this.campaignModel
+      .find({
+        workspaceId: workspaceObjectId,
+      })
+      .limit(1)
+      .exec();
+
+    const actualWorkspaceId =
+      campaignsAsObjectId.length > 0 ? workspaceObjectId : workspaceId;
     return await this.campaignModel.aggregate([
       {
         $match: {
-          workspaceId: new Types.ObjectId(workspaceId),
+          workspaceId: actualWorkspaceId,
           launchedAt: {
             $gte: startDate,
             $lte: endDate,
@@ -343,10 +353,21 @@ export class QueriesService {
     startDate: Date,
     endDate: Date,
   ) {
+    const workspaceObjectId = new Types.ObjectId(workspaceId);
+
+    const messagesAsObjectId = await this.campaignMessageModel
+      .find({
+        workspaceId: workspaceObjectId,
+      })
+      .limit(1)
+      .exec();
+
+    const actualWorkspaceId =
+      messagesAsObjectId.length > 0 ? workspaceObjectId : workspaceId;
     return await this.campaignMessageModel.aggregate([
       {
         $match: {
-          workspaceId: new Types.ObjectId(workspaceId),
+          workspaceId: actualWorkspaceId,
           sentAt: {
             $gte: startDate,
             $lte: endDate,
@@ -387,10 +408,21 @@ export class QueriesService {
     startDate: Date,
     endDate: Date,
   ) {
+    const workspaceObjectId = new Types.ObjectId(workspaceId);
+
+    const messagesAsObjectId = await this.campaignMessageModel
+      .find({
+        workspaceId: workspaceObjectId,
+      })
+      .limit(1)
+      .exec();
+
+    const actualWorkspaceId =
+      messagesAsObjectId.length > 0 ? workspaceObjectId : workspaceId;
     return await this.campaignMessageModel.aggregate([
       {
         $match: {
-          workspaceId: new Types.ObjectId(workspaceId),
+          workspaceId: actualWorkspaceId,
           sentAt: {
             $gte: startDate,
             $lte: endDate,
@@ -421,18 +453,40 @@ export class QueriesService {
   }
 
   async getRecentCampaigns(workspaceId: string) {
+    const workspaceObjectId = new Types.ObjectId(workspaceId);
+
+    const campaignsAsObjectId = await this.campaignModel
+      .find({
+        workspaceId: workspaceObjectId,
+      })
+      .limit(1)
+      .exec();
+
+    const actualWorkspaceId =
+      campaignsAsObjectId.length > 0 ? workspaceObjectId : workspaceId;
     return await this.campaignModel
-      .find({ workspaceId })
+      .find({ workspaceId: actualWorkspaceId })
       .sort({ createdAt: -1 })
       .limit(5)
       .exec();
   }
 
   async getTopContactTags(workspaceId: string) {
+    const workspaceObjectId = new Types.ObjectId(workspaceId);
+
+    const contactsAsObjectId = await this.contactModel
+      .find({
+        workspaceId: workspaceObjectId,
+      })
+      .limit(1)
+      .exec();
+
+    const actualWorkspaceId =
+      contactsAsObjectId.length > 0 ? workspaceObjectId : workspaceId;
     return await this.contactModel.aggregate([
       {
         $match: {
-          workspaceId: new Types.ObjectId(workspaceId),
+          workspaceId: actualWorkspaceId,
         },
       },
       { $unwind: '$tags' },
