@@ -17,6 +17,7 @@ import Dashboard from './features/user-portal/dashboard/pages/Dashboard';
 import { RoleBasedRoute } from './components/RoleBasedRoute';
 import Contacts from './features/user-portal/contacts/pages/Contacts';
 import MessageTemplates from './features/user-portal/message-templates/pages/MessageTemplates';
+import Campaigns from './features/user-portal/campaigns/pages/Campaigns';
 
 // Layout component to conditionally render navbar and footer
 function Layout({ children }: { children: React.ReactNode }) {
@@ -90,6 +91,16 @@ function App() {
               <ProtectedRoute>
                 <RoleBasedRoute requiredRole="viewer" adminAllowed={false}>
                   <MessageTemplates />
+                </RoleBasedRoute>
+              </ProtectedRoute>
+            } 
+          />
+           <Route 
+            path="/campaigns" 
+            element={
+              <ProtectedRoute>
+                <RoleBasedRoute requiredRole="viewer" adminAllowed={false}>
+                  <Campaigns />
                 </RoleBasedRoute>
               </ProtectedRoute>
             } 
