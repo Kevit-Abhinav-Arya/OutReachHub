@@ -3,23 +3,21 @@ import { useAppSelector } from './hooks/redux';
 import { selectIsLoading } from './features/auth/slices/authSlice';
 
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { RoleBasedRoute } from './components/RoleBasedRoute';
 import { AdminRedirectRoute } from './components/AdminRedirectRoute';
 
 import Navbar from './common/components/Navbar';
 import Footer from './common/components/Footer';
 
-
+import Dashboard from './features/user-portal/dashboard/pages/Dashboard';
+import Contacts from './features/user-portal/contacts/pages/Contacts';
+import Campaigns from './features/user-portal/campaigns/pages/Campaigns';
+import MessageTemplates from './features/user-portal/message-templates/pages/MessageTemplates';
 import Login from './features/auth/pages/Login';
 import WorkspaceSelection from './features/auth/pages/WorkspaceSelection';
 
 import './App.scss';
-import Dashboard from './features/user-portal/dashboard/pages/Dashboard';
-import { RoleBasedRoute } from './components/RoleBasedRoute';
-import Contacts from './features/user-portal/contacts/pages/Contacts';
-import MessageTemplates from './features/user-portal/message-templates/pages/MessageTemplates';
-import Campaigns from './features/user-portal/campaigns/pages/Campaigns';
 
-// Layout component to conditionally render navbar and footer
 function Layout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
   const isAuthRoute = location.pathname === '/login' || location.pathname === '/select-workspace';
@@ -48,6 +46,7 @@ function App() {
     <Router>
       <Layout>
         <Routes>
+          {/* Public routes */}
           <Route 
             path="/login" 
             element={
@@ -65,7 +64,11 @@ function App() {
               </ProtectedRoute>
             } 
           />
-           <Route 
+
+          
+
+          {/* User Portal Routes*/}
+          <Route 
             path="/" 
             element={
               <ProtectedRoute>
@@ -75,7 +78,8 @@ function App() {
               </ProtectedRoute>
             } 
           />
-           <Route 
+          
+          <Route 
             path="/contacts" 
             element={
               <ProtectedRoute>
@@ -85,17 +89,8 @@ function App() {
               </ProtectedRoute>
             } 
           />
-            <Route 
-            path="/message-templates" 
-            element={
-              <ProtectedRoute>
-                <RoleBasedRoute requiredRole="viewer" adminAllowed={false}>
-                  <MessageTemplates />
-                </RoleBasedRoute>
-              </ProtectedRoute>
-            } 
-          />
-           <Route 
+          
+          <Route 
             path="/campaigns" 
             element={
               <ProtectedRoute>
@@ -105,9 +100,19 @@ function App() {
               </ProtectedRoute>
             } 
           />
-
-       
           
+          <Route 
+            path="/message-templates" 
+            element={
+              <ProtectedRoute>
+                <RoleBasedRoute requiredRole="viewer" adminAllowed={false}>
+                  <MessageTemplates />
+                </RoleBasedRoute>
+              </ProtectedRoute>
+            } 
+          />
+          
+    
           <Route 
             path="*" 
             element={

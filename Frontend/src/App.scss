@@ -33,6 +33,25 @@ body {
   -webkit-text-fill-color: transparent;
 }
 
+// Scrollbar styling
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(26, 74, 94, 0.2);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #64ffda, #00b4d8);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #7fdbff, #00b4d8);
+}
+
 // Token Expired Popup Styles
 .popup-overlay {
   position: fixed;
@@ -109,7 +128,7 @@ body {
   .btn {
     min-width: 120px;
     font-weight: 600;
-
+    
     &:hover {
       transform: translateY(-2px);
       box-shadow: 0 8px 25px rgba(100, 255, 218, 0.3);

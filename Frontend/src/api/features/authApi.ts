@@ -6,7 +6,7 @@ import type {
   SelectWorkspaceRequest,
   SelectWorkspaceResponse,
   VerifyTokenResponse,
-} from "../../features/auth/types/auth.types";
+} from "@/features/auth/types/auth.types";
 
 export const authApi = {
   // Admin login

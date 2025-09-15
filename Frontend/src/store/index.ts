@@ -22,11 +22,7 @@ const authTransform = createTransform(
         tempToken: null,
       };
     }
-
     if (token && (!outboundState || !outboundState.isAuthenticated)) {
-      console.log(
-        "Redux Persist Transform: Token exists but no auth state, clearing token"
-      );
       localStorage.removeItem("authToken");
       return {
         user: null,

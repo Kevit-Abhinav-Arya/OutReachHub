@@ -6,7 +6,7 @@ import type {
   ContactsReachedPerDayResponse,
   RecentCampaignsResponse,
   TopContactTagsResponse,
-} from "../../features/user-portal/dashboard/types/analytics.types";
+} from "@/features/user-portal/dashboard/types/analytics.types";
 
 export const analyticsApi = {
   // Get campaigns per day chart data
