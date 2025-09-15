@@ -1,0 +1,29 @@
+// Color palette
+$primary-cyan: #64ffda;
+$secondary-blue: #7fdbff;
+$accent-blue: #00b4d8;
+$accent-cyan: #64ffda;
+$dark-bg: #232232;
+$light-text: #e7e0e0;
+
+// Text colors
+$text-primary: #e7e0e0;
+$text-secondary: rgba(231, 224, 224, 0.7);
+
+// Glassmorphism
+$glass-bg: rgba(35, 34, 50, 0.2);
+$glass-border: rgba(0, 180, 216, 0.1);
+$glass-blur: blur(4px);
+
+// Spacing
+$spacing-xs: 0.25rem;
+$spacing-sm: 0.5rem;
+$spacing-md: 1rem;
+$spacing-lg: 1.5rem;
+$spacing-xl: 2rem;
+
+// Breakpoints
+$mobile: 480px;
+$tablet: 768px;
+$desktop: 1024px;
+$wide: 1200px;
