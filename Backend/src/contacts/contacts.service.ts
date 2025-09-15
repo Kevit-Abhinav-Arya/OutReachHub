@@ -89,7 +89,10 @@ export class ContactsService {
         id: contact._id,
         name: contact.name,
         phoneNumber: contact.phoneNumber,
+        email: contact.email,
+        company: contact.company,
         tags: contact.tags,
+        notes: contact.notes,
         createdBy: {
           id: contact.createdBy._id,
           name: contact.createdBy.name,
@@ -144,7 +147,7 @@ export class ContactsService {
     updateContactDto: UpdateContactDto,
     workspaceId: string,
   ) {
-    const { name, phoneNumber, tags, notes } = updateContactDto;
+    const { name, phoneNumber, email, company, tags, notes } = updateContactDto;
 
     const contact = await this.queriesService.getContactById(
       contactId,
@@ -184,6 +187,20 @@ export class ContactsService {
       }
 
       updateFields.phoneNumber = phoneNumber.trim();
+    }
+
+    if (email !== undefined) {
+      if (!email.trim()) {
+        throw new BadRequestException('Email cannot be empty');
+      }
+      updateFields.email = email.toLowerCase().trim();
+    }
+
+    if (company !== undefined) {
+      if (!company.trim()) {
+        throw new BadRequestException('Company cannot be empty');
+      }
+      updateFields.company = company.trim();
     }
 
     if (tags !== undefined) {

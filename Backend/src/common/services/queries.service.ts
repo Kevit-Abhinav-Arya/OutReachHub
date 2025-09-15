@@ -96,9 +96,6 @@ export class QueriesService {
   async getWorkspaceById(workspaceId: string) {
     return await this.workspaceModel.findById(workspaceId);
   }
-  async getWorkspaceByName(workspaceName: string) {
-    return await this.workspaceModel.findOne({ name: workspaceName });
-  }
 
   async updateWorkspace(workspaceId: string, updateData: any) {
     const updatedWorkspace = await this.workspaceModel.findByIdAndUpdate(
@@ -291,6 +288,7 @@ export class QueriesService {
       .findById(userId)
       .populate('workspaces.workspaceId');
   }
+
   async getUsersNotInWorkspace(workspaceId: string) {
     return await this.userModel
       .find({
@@ -307,13 +305,16 @@ export class QueriesService {
   // ------------------------------------------------------------------
   // ANALYTICS QUERIES
   // ------------------------------------------------------------------
+
   async getCampaignsPerDay(
     workspaceId: string,
     startDate: Date,
     endDate: Date,
   ) {
+    // Try both string and ObjectId formats for workspace ID to handle different data storage formats
     const workspaceObjectId = new Types.ObjectId(workspaceId);
 
+    // Check which format is used in the database
     const campaignsAsObjectId = await this.campaignModel
       .find({
         workspaceId: workspaceObjectId,
@@ -323,11 +324,57 @@ export class QueriesService {
 
     const actualWorkspaceId =
       campaignsAsObjectId.length > 0 ? workspaceObjectId : workspaceId;
+
+    return await this.campaignModel.aggregate([
+      {
+        $match: {
+          workspaceId: actualWorkspaceId,
+          createdAt: {
+            $gte: startDate,
+            $lte: endDate,
+          },
+        },
+      },
+      {
+        $group: {
+          _id: {
+            $dateToString: {
+              format: '%Y-%m-%d',
+              date: '$createdAt',
+            },
+          },
+          count: { $sum: 1 },
+        },
+      },
+      { $sort: { _id: 1 } },
+    ]);
+  }
+
+  async getLaunchedCampaignsPerDay(
+    workspaceId: string,
+    startDate: Date,
+    endDate: Date,
+  ) {
+    // Try both string and ObjectId formats for workspace ID to handle different data storage formats
+    const workspaceObjectId = new Types.ObjectId(workspaceId);
+
+    // Check which format is used in the database
+    const campaignsAsObjectId = await this.campaignModel
+      .find({
+        workspaceId: workspaceObjectId,
+      })
+      .limit(1)
+      .exec();
+
+    const actualWorkspaceId =
+      campaignsAsObjectId.length > 0 ? workspaceObjectId : workspaceId;
+
     return await this.campaignModel.aggregate([
       {
         $match: {
           workspaceId: actualWorkspaceId,
           launchedAt: {
+            $exists: true,
             $gte: startDate,
             $lte: endDate,
           },
@@ -353,8 +400,10 @@ export class QueriesService {
     startDate: Date,
     endDate: Date,
   ) {
+    // Try both string and ObjectId formats for workspace ID to handle different data storage formats
     const workspaceObjectId = new Types.ObjectId(workspaceId);
 
+    // Check which format is used in the database
     const messagesAsObjectId = await this.campaignMessageModel
       .find({
         workspaceId: workspaceObjectId,
@@ -364,6 +413,7 @@ export class QueriesService {
 
     const actualWorkspaceId =
       messagesAsObjectId.length > 0 ? workspaceObjectId : workspaceId;
+
     return await this.campaignMessageModel.aggregate([
       {
         $match: {
@@ -408,8 +458,10 @@ export class QueriesService {
     startDate: Date,
     endDate: Date,
   ) {
+    // Try both string and ObjectId formats for workspace ID to handle different data storage formats
     const workspaceObjectId = new Types.ObjectId(workspaceId);
 
+    // Check which format is used in the database
     const messagesAsObjectId = await this.campaignMessageModel
       .find({
         workspaceId: workspaceObjectId,
@@ -419,6 +471,7 @@ export class QueriesService {
 
     const actualWorkspaceId =
       messagesAsObjectId.length > 0 ? workspaceObjectId : workspaceId;
+
     return await this.campaignMessageModel.aggregate([
       {
         $match: {
@@ -453,8 +506,10 @@ export class QueriesService {
   }
 
   async getRecentCampaigns(workspaceId: string) {
+    // Try both string and ObjectId formats for workspace ID to handle different data storage formats
     const workspaceObjectId = new Types.ObjectId(workspaceId);
 
+    // Check which format is used in the database
     const campaignsAsObjectId = await this.campaignModel
       .find({
         workspaceId: workspaceObjectId,
@@ -464,6 +519,7 @@ export class QueriesService {
 
     const actualWorkspaceId =
       campaignsAsObjectId.length > 0 ? workspaceObjectId : workspaceId;
+
     return await this.campaignModel
       .find({ workspaceId: actualWorkspaceId })
       .sort({ createdAt: -1 })
@@ -472,8 +528,10 @@ export class QueriesService {
   }
 
   async getTopContactTags(workspaceId: string) {
+    // Try both string and ObjectId formats for workspace ID to handle different data storage formats
     const workspaceObjectId = new Types.ObjectId(workspaceId);
 
+    // Check which format is used in the database
     const contactsAsObjectId = await this.contactModel
       .find({
         workspaceId: workspaceObjectId,
@@ -483,6 +541,7 @@ export class QueriesService {
 
     const actualWorkspaceId =
       contactsAsObjectId.length > 0 ? workspaceObjectId : workspaceId;
+
     return await this.contactModel.aggregate([
       {
         $match: {
@@ -727,15 +786,17 @@ export class QueriesService {
     workspaceId: string,
     updateData: any,
   ) {
-    return await this.campaignModel.findOneAndUpdate(
-      {
-        _id: campaignId,
-        workspaceId,
-        status: 'Draft',
-      },
-      updateData,
-      { new: true },
-    );
+    return await this.campaignModel
+      .findOneAndUpdate(
+        {
+          _id: campaignId,
+          workspaceId,
+          status: 'Draft',
+        },
+        updateData,
+        { new: true },
+      )
+      .populate('templateId');
   }
 
   async deleteCampaign(campaignId: string, workspaceId: string) {
@@ -803,6 +864,15 @@ export class QueriesService {
     }));
     return await this.campaignMessageModel.insertMany(messages);
   }
+
+  async createCampaignMessage(messageData: any) {
+    const message = new this.campaignMessageModel({
+      _id: new Types.ObjectId(),
+      ...messageData,
+    });
+    return await message.save();
+  }
+
   async getCampaignMessages(
     campaignId: string,
     options: { limit?: number; skip?: number } = {},
@@ -813,6 +883,18 @@ export class QueriesService {
       .skip(skip)
       .limit(limit)
       .exec();
+  }
+
+  async updateCampaignMessage(messageId: string, updateData: any) {
+    return await this.campaignMessageModel.findByIdAndUpdate(
+      messageId,
+      updateData,
+      { new: true },
+    );
+  }
+
+  async deleteCampaignMessages(campaignId: string) {
+    return await this.campaignMessageModel.deleteMany({ campaignId });
   }
 
   // ------------------------------------------------------------------

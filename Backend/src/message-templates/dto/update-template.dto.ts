@@ -1,4 +1,4 @@
-import { IsString, IsIn, IsOptional, IsUrl } from 'class-validator';
+import { IsString, IsIn, IsOptional } from 'class-validator';
 
 export class UpdateTemplateDto {
   @IsOptional()
@@ -16,6 +16,5 @@ export class UpdateTemplateDto {
 
   @IsOptional()
   @IsString()
-  @IsUrl()
   imageUrl?: string;
 }

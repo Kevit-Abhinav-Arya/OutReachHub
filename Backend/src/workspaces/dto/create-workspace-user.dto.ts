@@ -5,6 +5,7 @@ import {
   IsEnum,
   MinLength,
   MaxLength,
+  Matches,
 } from 'class-validator';
 
 export class CreateWorkspaceUserDto {
@@ -12,7 +13,13 @@ export class CreateWorkspaceUserDto {
   email: string;
 
   @IsString()
-  @MinLength(6, { message: 'Password must be at least 6 characters long' })
+  @Matches(
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@.#$!%*?&^])[A-Za-z\d@.#$!%*?&]{5,15}$/,
+    {
+      message:
+        'Password must be 5-15 characters long, include uppercase, lowercase, number, and special character.',
+    },
+  )
   password: string;
 
   @IsString()

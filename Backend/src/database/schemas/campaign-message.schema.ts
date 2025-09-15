@@ -25,10 +25,10 @@ export class CampaignMessage {
   @Prop()
   messageImageUrl: string;
 
-  @Prop({ required: true, enum: ['Sent', 'Failed'] })
+  @Prop({ required: true, enum: ['Sent', 'Failed', 'Pending', 'Delivered'] })
   status: string;
 
-  @Prop({ default: Date.now })
+  @Prop()
   sentAt: Date;
 }
 

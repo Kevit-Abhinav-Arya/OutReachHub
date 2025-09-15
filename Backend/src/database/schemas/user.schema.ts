@@ -20,7 +20,7 @@ export class WorkspaceAccess {
 export class User {
   _id: Types.ObjectId;
 
-  @Prop({ required: true, unique: true })
+  @Prop({ required: true })
   email: string;
 
   @Prop({ required: true })

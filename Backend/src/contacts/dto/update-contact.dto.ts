@@ -1,6 +1,7 @@
 import {
   IsOptional,
   IsString,
+  IsEmail,
   IsArray,
   Matches,
   MinLength,
@@ -22,6 +23,18 @@ export class UpdateContactDto {
     message: 'Phone number must be a valid mobile number',
   })
   phoneNumber?: string;
+
+  @IsOptional()
+  @IsEmail()
+  @Transform(({ value }) => value?.toLowerCase().trim())
+  email?: string;
+
+  @IsOptional()
+  @IsString()
+  @MinLength(1)
+  @MaxLength(100)
+  @Transform(({ value }) => value?.trim())
+  company?: string;
 
   @IsOptional()
   @IsArray()

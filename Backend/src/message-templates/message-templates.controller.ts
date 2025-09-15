@@ -11,7 +11,12 @@ import {
   HttpCode,
   HttpStatus,
   Req,
+  UseInterceptors,
+  UploadedFile,
+  BadRequestException,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { multerConfig } from '../config/multer.config';
 import { Request } from 'express';
 
 import { MessageTemplatesService } from './message-templates.service';
@@ -59,7 +64,33 @@ export class MessageTemplatesController {
     );
   }
 
-  // Get All Templates
+  @Post('upload-image')
+  @UseGuards(EditorGuard)
+  @UseInterceptors(FileInterceptor('image', multerConfig))
+  @HttpCode(HttpStatus.CREATED)
+  async uploadImage(
+    @UploadedFile() file: Express.Multer.File,
+    @Req() req: AuthenticatedRequest,
+  ) {
+    if (!file) {
+      throw new BadRequestException('No image file provided');
+    }
+
+    const protocol = req.protocol;
+    const host = req.get('Host');
+    const imageUrl = `${protocol}://${host}/uploads/message-templates/${file.filename}`;
+
+    return {
+      success: true,
+      message: 'Image uploaded successfully',
+      data: {
+        imageUrl,
+        originalName: file.originalname,
+        size: file.size,
+      },
+    };
+  }
+
   @Get()
   @UseGuards(ViewerGuard)
   async getAllTemplates(
