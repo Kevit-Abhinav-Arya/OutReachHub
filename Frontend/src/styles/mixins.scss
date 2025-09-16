@@ -1,0 +1,47 @@
+// Reusable SCSS mixins
+@use "./variables.scss" as *;
+// Glassmorphism effect
+@mixin glass-effect(
+  $bg: $glass-bg,
+  $border: $glass-border,
+  $blur: $glass-blur
+) {
+  background: $bg;
+  backdrop-filter: $blur;
+  -webkit-backdrop-filter: $blur;
+  border: 1px solid $border;
+}
+
+// Flexbox center
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// Gradient text
+@mixin gradient-text($color1: $primary-cyan, $color2: $secondary-blue) {
+  background: linear-gradient(90deg, $color1, $color2);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+// Responsive breakpoints
+@mixin mobile {
+  @media (max-width: $mobile) {
+    @content;
+  }
+}
+
+@mixin tablet {
+  @media (max-width: $tablet) {
+    @content;
+  }
+}
+
+@mixin desktop {
+  @media (min-width: $desktop) {
+    @content;
+  }
+}
