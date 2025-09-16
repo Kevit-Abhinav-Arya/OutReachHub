@@ -3,9 +3,9 @@ import {
   NotFoundException,
   BadRequestException,
   ConflictException,
-} from '@nestjs/common';
-import { QueriesService } from '../common/services/queries.service';
-import { CreateContactDto, UpdateContactDto, GetContactsQueryDto } from './dto';
+} from "@nestjs/common";
+import { QueriesService } from "../common/services/queries.service";
+import { CreateContactDto, UpdateContactDto, GetContactsQueryDto } from "./dto";
 
 @Injectable()
 export class ContactsService {
@@ -15,7 +15,7 @@ export class ContactsService {
   async createContact(
     createContactDto: CreateContactDto,
     workspaceId: string,
-    createdBy: string,
+    createdBy: string
   ) {
     const {
       name,
@@ -29,12 +29,12 @@ export class ContactsService {
     // Checking if phone number already exists in workspace
     const existingContact = await this.queriesService.checkPhoneNumberExists(
       workspaceId,
-      phoneNumber.trim(),
+      phoneNumber.trim()
     );
 
     if (existingContact) {
       throw new ConflictException(
-        'Contact with this phone number already exists in this workspace',
+        "Contact with this phone number already exists in this workspace"
       );
     }
 
@@ -52,7 +52,7 @@ export class ContactsService {
     const contact = await this.queriesService.createContact(contactData);
 
     return {
-      message: 'Contact created successfully',
+      message: "Contact created successfully",
       contact: {
         id: contact._id,
         name: contact.name,
@@ -65,11 +65,11 @@ export class ContactsService {
 
   // Get All Contacts
   async getAllContacts(query: GetContactsQueryDto, workspaceId: string) {
-    const { page = 1, limit = 10, search = '', tags } = query;
+    const { page = 1, limit = 10, search = "", tags } = query;
 
     const tagArray = tags
       ? tags
-          .split(',')
+          .split(",")
           .map((tag: string) => tag.trim())
           .filter((tag: string) => tag)
       : [];
@@ -81,7 +81,7 @@ export class ContactsService {
         limit,
         search,
         tagFilter: tagArray.length > 0 ? tagArray[0] : undefined,
-      },
+      }
     );
 
     return {
@@ -114,11 +114,11 @@ export class ContactsService {
   async getContactById(contactId: string, workspaceId: string) {
     const contact: any = await this.queriesService.getContactById(
       contactId,
-      workspaceId,
+      workspaceId
     );
 
     if (!contact) {
-      throw new NotFoundException('Contact not found');
+      throw new NotFoundException("Contact not found");
     }
 
     return {
@@ -145,43 +145,43 @@ export class ContactsService {
   async updateContact(
     contactId: string,
     updateContactDto: UpdateContactDto,
-    workspaceId: string,
+    workspaceId: string
   ) {
     const { name, phoneNumber, email, company, tags, notes } = updateContactDto;
 
     const contact = await this.queriesService.getContactById(
       contactId,
-      workspaceId,
+      workspaceId
     );
 
     if (!contact) {
-      throw new NotFoundException('Contact not found');
+      throw new NotFoundException("Contact not found");
     }
 
     const updateFields: any = { updatedAt: new Date() };
 
     if (name !== undefined) {
       if (!name.trim()) {
-        throw new BadRequestException('Name cannot be empty');
+        throw new BadRequestException("Name cannot be empty");
       }
       updateFields.name = name.trim();
     }
 
     if (phoneNumber !== undefined) {
       if (!phoneNumber.trim()) {
-        throw new BadRequestException('Phone number cannot be empty');
+        throw new BadRequestException("Phone number cannot be empty");
       }
 
       if (phoneNumber.trim() !== contact.phoneNumber) {
         const existingContact =
           await this.queriesService.checkPhoneNumberExists(
             workspaceId,
-            phoneNumber.trim(),
+            phoneNumber.trim()
           );
 
         if (existingContact) {
           throw new ConflictException(
-            'Phone number is already used by another contact in this workspace',
+            "Phone number is already used by another contact in this workspace"
           );
         }
       }
@@ -191,14 +191,14 @@ export class ContactsService {
 
     if (email !== undefined) {
       if (!email.trim()) {
-        throw new BadRequestException('Email cannot be empty');
+        throw new BadRequestException("Email cannot be empty");
       }
       updateFields.email = email.toLowerCase().trim();
     }
 
     if (company !== undefined) {
       if (!company.trim()) {
-        throw new BadRequestException('Company cannot be empty');
+        throw new BadRequestException("Company cannot be empty");
       }
       updateFields.company = company.trim();
     }
@@ -216,15 +216,15 @@ export class ContactsService {
     const updatedContact: any = await this.queriesService.updateContact(
       contactId,
       workspaceId,
-      updateFields,
+      updateFields
     );
 
     if (!updatedContact) {
-      throw new NotFoundException('Contact not found after update');
+      throw new NotFoundException("Contact not found after update");
     }
 
     return {
-      message: 'Contact updated successfully',
+      message: "Contact updated successfully",
       contact: {
         id: updatedContact._id,
         name: updatedContact.name,
@@ -248,15 +248,24 @@ export class ContactsService {
   async deleteContact(contactId: string, workspaceId: string) {
     const contact = await this.queriesService.deleteContact(
       contactId,
-      workspaceId,
+      workspaceId
     );
 
     if (!contact) {
-      throw new NotFoundException('Contact not found');
+      throw new NotFoundException("Contact not found");
     }
 
     return {
-      message: 'Contact deleted successfully',
+      message: "Contact deleted successfully",
+    };
+  }
+
+  // Get Workspace Tags
+  async getWorkspaceTags(workspaceId: string) {
+    const tags = await this.queriesService.getWorkspaceTags(workspaceId);
+
+    return {
+      tags: tags.map((tag: any) => tag._id),
     };
   }
 }

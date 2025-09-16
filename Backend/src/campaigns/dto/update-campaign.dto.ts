@@ -17,7 +17,7 @@ export class UpdateCampaignDto {
           .map((tag) => tag.trim())
       : [],
   )
-  targetedTags?: string[];
+  targetTags?: string[];
 
   @IsOptional()
   @IsString()

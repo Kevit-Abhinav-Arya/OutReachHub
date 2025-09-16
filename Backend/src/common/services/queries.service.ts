@@ -1,13 +1,13 @@
-import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
-import { Admin } from '../../database/schemas/admin.schema';
-import { User } from '../../database/schemas/user.schema';
-import { Workspace } from '../../database/schemas/workspace.schema';
-import { Contact } from '../../database/schemas/contact.schema';
-import { Message } from '../../database/schemas/message.schema';
-import { Campaign } from '../../database/schemas/campaign.schema';
-import { CampaignMessage } from '../../database/schemas/campaign-message.schema';
+import { Injectable } from "@nestjs/common";
+import { InjectModel } from "@nestjs/mongoose";
+import { Model, Types } from "mongoose";
+import { Admin } from "../../database/schemas/admin.schema";
+import { User } from "../../database/schemas/user.schema";
+import { Workspace } from "../../database/schemas/workspace.schema";
+import { Contact } from "../../database/schemas/contact.schema";
+import { Message } from "../../database/schemas/message.schema";
+import { Campaign } from "../../database/schemas/campaign.schema";
+import { CampaignMessage } from "../../database/schemas/campaign-message.schema";
 
 // Types for query options
 interface PaginationOptions {
@@ -21,11 +21,11 @@ interface ContactQueryOptions extends PaginationOptions {
 }
 
 interface MessageQueryOptions extends PaginationOptions {
-  typeFilter?: 'Text' | 'Text & Image';
+  typeFilter?: "Text" | "Text & Image";
 }
 
 interface CampaignQueryOptions extends PaginationOptions {
-  statusFilter?: 'Draft' | 'Running' | 'Completed' | 'Paused';
+  statusFilter?: "Draft" | "Running" | "Completed" | "Paused";
 }
 
 @Injectable()
@@ -38,7 +38,7 @@ export class QueriesService {
     @InjectModel(Message.name) private messageModel: Model<Message>,
     @InjectModel(Campaign.name) private campaignModel: Model<Campaign>,
     @InjectModel(CampaignMessage.name)
-    private campaignMessageModel: Model<CampaignMessage>,
+    private campaignMessageModel: Model<CampaignMessage>
   ) {}
 
   // ------------------------------------------------------------------
@@ -60,12 +60,12 @@ export class QueriesService {
 
   // Workspace Module
   async listWorkspaces(options: PaginationOptions = {}) {
-    const { page = 1, limit = 10, search = '' } = options;
+    const { page = 1, limit = 10, search = "" } = options;
     const skip = (page - 1) * limit;
 
     let query = {};
     if (search) {
-      query = { name: { $regex: search, $options: 'i' } };
+      query = { name: { $regex: search, $options: "i" } };
     }
 
     const [workspaces, total] = await Promise.all([
@@ -101,17 +101,17 @@ export class QueriesService {
     const updatedWorkspace = await this.workspaceModel.findByIdAndUpdate(
       workspaceId,
       { ...updateData },
-      { new: true },
+      { new: true }
     );
 
     if (updateData.name && updatedWorkspace) {
       await this.userModel.updateMany(
-        { 'workspaces.workspaceId': workspaceId },
+        { "workspaces.workspaceId": workspaceId },
         {
           $set: {
-            'workspaces.$.workspaceName': updateData.name,
+            "workspaces.$.workspaceName": updateData.name,
           },
-        },
+        }
       );
     }
 
@@ -126,10 +126,10 @@ export class QueriesService {
   async listWorkspaceUsers(
     workspaceId: string,
     page: number = 1,
-    limit: number = 10,
+    limit: number = 10
   ) {
     const skip = (page - 1) * limit;
-    const query = { 'workspaces.workspaceId': workspaceId };
+    const query = { "workspaces.workspaceId": workspaceId };
 
     const [users, total] = await Promise.all([
       this.userModel
@@ -146,7 +146,7 @@ export class QueriesService {
 
   async getWorkspaceUsersCount(workspaceId: string) {
     return await this.userModel.countDocuments({
-      'workspaces.workspaceId': workspaceId,
+      "workspaces.workspaceId": workspaceId,
     });
   }
 
@@ -175,7 +175,7 @@ export class QueriesService {
     return await this.userModel.findByIdAndUpdate(
       userId,
       { ...updateData },
-      { new: true },
+      { new: true }
     );
   }
 
@@ -187,7 +187,7 @@ export class QueriesService {
     userId: string,
     workspaceId: string,
     workspaceName: string,
-    role: string,
+    role: string
   ) {
     return await this.userModel.findByIdAndUpdate(
       userId,
@@ -196,7 +196,7 @@ export class QueriesService {
           workspaces: { workspaceId, workspaceName, role },
         },
       },
-      { new: true },
+      { new: true }
     );
   }
 
@@ -208,7 +208,7 @@ export class QueriesService {
           workspaces: { workspaceId },
         },
       },
-      { new: true },
+      { new: true }
     );
   }
 
@@ -229,7 +229,7 @@ export class QueriesService {
     const skip = (page - 1) * limit;
     return await this.userModel
       .find()
-      .populate('workspaces.workspaceId', 'name')
+      .populate("workspaces.workspaceId", "name")
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
@@ -243,13 +243,13 @@ export class QueriesService {
   async getUserById(userId: string) {
     return await this.userModel
       .findById(userId)
-      .populate('workspaces.workspaceId', 'name');
+      .populate("workspaces.workspaceId", "name");
   }
 
   async updateUser(userId: string, updateData: any) {
     return await this.userModel
       .findByIdAndUpdate(userId, { ...updateData }, { new: true })
-      .populate('workspaces.workspaceId', 'name');
+      .populate("workspaces.workspaceId", "name");
   }
 
   async deleteUser(userId: string) {
@@ -261,11 +261,11 @@ export class QueriesService {
     return await this.userModel
       .find({
         $or: [
-          { name: { $regex: searchTerm, $options: 'i' } },
-          { email: { $regex: searchTerm, $options: 'i' } },
+          { name: { $regex: searchTerm, $options: "i" } },
+          { email: { $regex: searchTerm, $options: "i" } },
         ],
       })
-      .populate('workspaces.workspaceId', 'name')
+      .populate("workspaces.workspaceId", "name")
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
@@ -275,7 +275,7 @@ export class QueriesService {
   async getUserByEmail(email: string) {
     return await this.userModel
       .findOne({ email })
-      .populate('workspaces.workspaceId', 'name');
+      .populate("workspaces.workspaceId", "name");
   }
 
   // User Authentication
@@ -286,15 +286,15 @@ export class QueriesService {
   async getUserWorkspaces(userId: string) {
     return await this.userModel
       .findById(userId)
-      .populate('workspaces.workspaceId');
+      .populate("workspaces.workspaceId");
   }
 
   async getUsersNotInWorkspace(workspaceId: string) {
     return await this.userModel
       .find({
-        'workspaces.workspaceId': { $ne: workspaceId },
+        "workspaces.workspaceId": { $ne: workspaceId },
       })
-      .select('_id name email')
+      .select("_id name email")
       .exec();
   }
 
@@ -309,7 +309,7 @@ export class QueriesService {
   async getCampaignsPerDay(
     workspaceId: string,
     startDate: Date,
-    endDate: Date,
+    endDate: Date
   ) {
     // Try both string and ObjectId formats for workspace ID to handle different data storage formats
     const workspaceObjectId = new Types.ObjectId(workspaceId);
@@ -339,8 +339,8 @@ export class QueriesService {
         $group: {
           _id: {
             $dateToString: {
-              format: '%Y-%m-%d',
-              date: '$createdAt',
+              format: "%Y-%m-%d",
+              date: "$createdAt",
             },
           },
           count: { $sum: 1 },
@@ -353,7 +353,7 @@ export class QueriesService {
   async getLaunchedCampaignsPerDay(
     workspaceId: string,
     startDate: Date,
-    endDate: Date,
+    endDate: Date
   ) {
     // Try both string and ObjectId formats for workspace ID to handle different data storage formats
     const workspaceObjectId = new Types.ObjectId(workspaceId);
@@ -384,8 +384,8 @@ export class QueriesService {
         $group: {
           _id: {
             $dateToString: {
-              format: '%Y-%m-%d',
-              date: '$launchedAt',
+              format: "%Y-%m-%d",
+              date: "$launchedAt",
             },
           },
           count: { $sum: 1 },
@@ -398,7 +398,7 @@ export class QueriesService {
   async getMessagesSentPerTypePerDay(
     workspaceId: string,
     startDate: Date,
-    endDate: Date,
+    endDate: Date
   ) {
     // Try both string and ObjectId formats for workspace ID to handle different data storage formats
     const workspaceObjectId = new Types.ObjectId(workspaceId);
@@ -428,9 +428,9 @@ export class QueriesService {
         $addFields: {
           messageType: {
             $cond: {
-              if: { $ne: ['$messageImageUrl', null] },
-              then: 'Text & Image',
-              else: 'Text',
+              if: { $ne: ["$messageImageUrl", null] },
+              then: "Text & Image",
+              else: "Text",
             },
           },
         },
@@ -440,23 +440,23 @@ export class QueriesService {
           _id: {
             date: {
               $dateToString: {
-                format: '%Y-%m-%d',
-                date: '$sentAt',
+                format: "%Y-%m-%d",
+                date: "$sentAt",
               },
             },
-            type: '$messageType',
+            type: "$messageType",
           },
           count: { $sum: 1 },
         },
       },
-      { $sort: { '_id.date': 1, '_id.type': 1 } },
+      { $sort: { "_id.date": 1, "_id.type": 1 } },
     ]);
   }
 
   async getContactsReachedPerDay(
     workspaceId: string,
     startDate: Date,
-    endDate: Date,
+    endDate: Date
   ) {
     // Try both string and ObjectId formats for workspace ID to handle different data storage formats
     const workspaceObjectId = new Types.ObjectId(workspaceId);
@@ -487,18 +487,18 @@ export class QueriesService {
           _id: {
             date: {
               $dateToString: {
-                format: '%Y-%m-%d',
-                date: '$sentAt',
+                format: "%Y-%m-%d",
+                date: "$sentAt",
               },
             },
           },
-          uniqueContacts: { $addToSet: '$contactPhoneNumber' },
+          uniqueContacts: { $addToSet: "$contactPhoneNumber" },
         },
       },
       {
         $project: {
           _id: 1,
-          count: { $size: '$uniqueContacts' },
+          count: { $size: "$uniqueContacts" },
         },
       },
       { $sort: { _id: 1 } },
@@ -548,10 +548,10 @@ export class QueriesService {
           workspaceId: actualWorkspaceId,
         },
       },
-      { $unwind: '$tags' },
+      { $unwind: "$tags" },
       {
         $group: {
-          _id: '$tags',
+          _id: "$tags",
           contactCount: { $sum: 1 },
         },
       },
@@ -565,7 +565,7 @@ export class QueriesService {
   // ------------------------------------------------------------------
 
   async listContacts(workspaceId: string, options: ContactQueryOptions = {}) {
-    const { page = 1, limit = 10, tagFilter, search = '' } = options;
+    const { page = 1, limit = 10, tagFilter, search = "" } = options;
     const skip = (page - 1) * limit;
     let query: any = { workspaceId };
 
@@ -575,16 +575,16 @@ export class QueriesService {
 
     if (search) {
       query.$or = [
-        { phoneNumber: { $regex: search, $options: 'i' } },
-        { email: { $regex: search, $options: 'i' } },
-        { name: { $regex: search, $options: 'i' } },
+        { phoneNumber: { $regex: search, $options: "i" } },
+        { email: { $regex: search, $options: "i" } },
+        { name: { $regex: search, $options: "i" } },
       ];
     }
 
     const [contacts, total] = await Promise.all([
       this.contactModel
         .find(query)
-        .populate('createdBy', 'name email')
+        .populate("createdBy", "name email")
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit)
@@ -610,14 +610,14 @@ export class QueriesService {
         _id: contactId,
         workspaceId,
       })
-      .populate('createdBy', 'name email');
+      .populate("createdBy", "name email");
   }
 
   async updateContact(contactId: string, workspaceId: string, updateData: any) {
     return await this.contactModel.findOneAndUpdate(
       { _id: contactId, workspaceId },
       { ...updateData, updatedAt: new Date() },
-      { new: true },
+      { new: true }
     );
   }
 
@@ -647,7 +647,7 @@ export class QueriesService {
   // ------------------------------------------------------------------
 
   async listMessages(workspaceId: string, options: MessageQueryOptions = {}) {
-    const { page = 1, limit = 10, typeFilter, search = '' } = options;
+    const { page = 1, limit = 10, typeFilter, search = "" } = options;
     const skip = (page - 1) * limit;
     let query: any = { workspaceId };
 
@@ -655,13 +655,13 @@ export class QueriesService {
       query.type = typeFilter;
     }
     if (search) {
-      query.$or = [{ name: { $regex: search, $options: 'i' } }];
+      query.$or = [{ name: { $regex: search, $options: "i" } }];
     }
 
     const [messages, total] = await Promise.all([
       this.messageModel
         .find(query)
-        .populate('createdBy', 'name email')
+        .populate("createdBy", "name email")
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit)
@@ -694,7 +694,7 @@ export class QueriesService {
         _id: messageId,
         workspaceId,
       })
-      .populate('createdBy', 'name email');
+      .populate("createdBy", "name email");
   }
 
   async getMessageByName(workspaceId: string, name: string) {
@@ -707,7 +707,7 @@ export class QueriesService {
       .findOneAndUpdate({ _id: messageId, workspaceId }, updateData, {
         new: true,
       })
-      .populate('createdBy', 'name email')
+      .populate("createdBy", "name email")
       .exec();
   }
 
@@ -723,7 +723,7 @@ export class QueriesService {
   // ------------------------------------------------------------------
 
   async listCampaigns(workspaceId: string, options: CampaignQueryOptions = {}) {
-    const { page = 1, limit = 10, statusFilter, search = '' } = options;
+    const { page = 1, limit = 10, statusFilter, search = "" } = options;
     const skip = (page - 1) * limit;
     let query: any = { workspaceId };
 
@@ -732,13 +732,13 @@ export class QueriesService {
     }
 
     if (search && search.trim()) {
-      query.name = { $regex: search, $options: 'i' };
+      query.name = { $regex: search, $options: "i" };
     }
 
     const campaigns = await this.campaignModel
       .find(query)
-      .populate('templateId', 'name type')
-      .populate('createdBy', 'name email')
+      .populate("templateId", "name type body imageUrl")
+      .populate("createdBy", "name email")
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
@@ -760,7 +760,7 @@ export class QueriesService {
   async createCampaign(campaignData: any) {
     const campaign = new this.campaignModel({
       _id: new Types.ObjectId(),
-      status: 'Draft',
+      status: "Draft",
       ...campaignData,
     });
     return await campaign.save();
@@ -772,8 +772,8 @@ export class QueriesService {
         _id: campaignId,
         workspaceId,
       })
-      .populate('templateId')
-      .populate('createdBy', 'name email');
+      .populate("templateId", "name type body imageUrl")
+      .populate("createdBy", "name email");
   }
 
   async getCampaignByName(workspaceId: string, name: string) {
@@ -784,19 +784,20 @@ export class QueriesService {
   async updateCampaign(
     campaignId: string,
     workspaceId: string,
-    updateData: any,
+    updateData: any
   ) {
     return await this.campaignModel
       .findOneAndUpdate(
         {
           _id: campaignId,
           workspaceId,
-          status: 'Draft',
+          status: "Draft",
         },
         updateData,
-        { new: true },
+        { new: true }
       )
-      .populate('templateId');
+      .populate("templateId", "name type body imageUrl")
+      .populate("createdBy", "name email");
   }
 
   async deleteCampaign(campaignId: string, workspaceId: string) {
@@ -820,7 +821,7 @@ export class QueriesService {
       name: newName,
       targetTags: [...originalCampaign.targetTags],
       templateId: originalCampaign.templateId,
-      status: 'Draft',
+      status: "Draft",
       createdBy: originalCampaign.createdBy,
       createdAt: new Date(),
     });
@@ -833,13 +834,13 @@ export class QueriesService {
       {
         _id: campaignId,
         workspaceId,
-        status: 'Draft',
+        status: "Draft",
       },
       {
-        status: 'Running',
+        status: "Running",
         launchedAt: new Date(),
       },
-      { new: true },
+      { new: true }
     );
   }
 
@@ -847,7 +848,7 @@ export class QueriesService {
     return await this.campaignModel.findByIdAndUpdate(
       campaignId,
       { status },
-      { new: true },
+      { new: true }
     );
   }
 
@@ -856,7 +857,7 @@ export class QueriesService {
   // ------------------------------------------------------------------
 
   async createCampaignMessages(messagesArray: any[]) {
-    console.log('inside bulk create messages............');
+    console.log("inside bulk create messages............");
     const messages = messagesArray.map((messageData) => ({
       _id: new Types.ObjectId(),
       sentAt: new Date(),
@@ -875,7 +876,7 @@ export class QueriesService {
 
   async getCampaignMessages(
     campaignId: string,
-    options: { limit?: number; skip?: number } = {},
+    options: { limit?: number; skip?: number } = {}
   ) {
     const { limit = 10, skip = 0 } = options;
     return await this.campaignMessageModel
@@ -889,7 +890,7 @@ export class QueriesService {
     return await this.campaignMessageModel.findByIdAndUpdate(
       messageId,
       updateData,
-      { new: true },
+      { new: true }
     );
   }
 
@@ -904,29 +905,37 @@ export class QueriesService {
   async checkUserWorkspaceAccess(userId: string, workspaceId: string) {
     const user = await this.userModel.findOne({
       _id: userId,
-      'workspaces.workspaceId': workspaceId,
+      "workspaces.workspaceId": workspaceId,
     });
 
     if (!user) return null;
 
     const workspace = user.workspaces.find(
-      (ws) => ws.workspaceId.toString() === workspaceId.toString(),
+      (ws) => ws.workspaceId.toString() === workspaceId.toString()
     );
 
     return workspace ? workspace.role : null;
   }
 
   async getWorkspaceTags(workspaceId: string) {
+    const testContacts = await this.contactModel.find({ workspaceId }).limit(1);
+
+    if (testContacts.length === 0) {
+      return [];
+    }
+
+    const actualWorkspaceId = testContacts[0].workspaceId;
+
     return await this.contactModel.aggregate([
       {
         $match: {
-          workspaceId: new Types.ObjectId(workspaceId),
+          workspaceId: actualWorkspaceId,
         },
       },
-      { $unwind: '$tags' },
+      { $unwind: "$tags" },
       {
         $group: {
-          _id: '$tags',
+          _id: "$tags",
         },
       },
       { $sort: { _id: 1 } },
