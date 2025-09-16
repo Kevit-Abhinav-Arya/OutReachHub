@@ -65,7 +65,7 @@ export const deleteMessageTemplate = async (id: string) => {
 // Upload image for template
 export const uploadTemplateImage = async (file: File) => {
   const formData = new FormData();
-  formData.append('image', file);
+  formData.append("image", file);
 
   const response = await apiClient.post<{
     success: boolean;
@@ -75,11 +75,11 @@ export const uploadTemplateImage = async (file: File) => {
       originalName: string;
       size: number;
     };
-  }>('/message-templates/upload-image', formData, {
+  }>("/message-templates/upload-image", formData, {
     headers: {
-      'Content-Type': 'multipart/form-data',
+      "Content-Type": "multipart/form-data",
     },
   });
-  
+
   return response.data;
 };

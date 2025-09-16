@@ -17,6 +17,7 @@ import Login from './features/auth/pages/Login';
 import WorkspaceSelection from './features/auth/pages/WorkspaceSelection';
 
 import './App.scss';
+import AdminDashboard from './features/admin-portal/dashboard/pages/AdminDashboard';
 
 function Layout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
@@ -64,8 +65,17 @@ function App() {
               </ProtectedRoute>
             } 
           />
-
-          
+          {/* Admin portal */}
+            <Route 
+            path="/admin" 
+            element={
+              <ProtectedRoute>
+                <RoleBasedRoute requiredRole="admin">
+                  <AdminDashboard />
+                </RoleBasedRoute>
+              </ProtectedRoute>
+            } 
+          />
 
           {/* User Portal Routes*/}
           <Route 

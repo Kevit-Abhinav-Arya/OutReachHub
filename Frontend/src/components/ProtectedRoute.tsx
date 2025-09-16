@@ -16,16 +16,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   const isLoading = useAppSelector(selectIsLoading);
   const location = useLocation();
   
-  // Debug logging
-  const user = useAppSelector((state: any) => state.auth.user);
-  console.log('ProtectedRoute Debug:', {
-    pathname: location.pathname,
-    requireAuth,
-    isAuthenticated,
-    isLoading,
-    user,
-    hasToken: !!localStorage.getItem('authToken')
-  });
+
 
   if (isLoading) {
     console.log('ProtectedRoute: Loading state, showing loading screen');
@@ -52,6 +43,5 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     return <Navigate to="/" state={{ from: location }}  replace />;
   }
 
-  console.log('ProtectedRoute: All checks passed, rendering children');
   return <>{children}</>;
 };
