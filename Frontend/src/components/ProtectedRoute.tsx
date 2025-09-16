@@ -34,12 +34,10 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   }
 
   if (requireAuth && !isAuthenticated) {
-    console.log('ProtectedRoute: Auth required but not authenticated, redirecting to login');
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
   if (!requireAuth && isAuthenticated) {
-    console.log('ProtectedRoute: No auth required but user is authenticated, redirecting to dashboard');
     return <Navigate to="/" state={{ from: location }}  replace />;
   }
 

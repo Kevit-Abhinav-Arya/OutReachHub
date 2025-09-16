@@ -16,7 +16,6 @@ import MessageTemplates from './features/user-portal/message-templates/pages/Mes
 import Login from './features/auth/pages/Login';
 import WorkspaceSelection from './features/auth/pages/WorkspaceSelection';
 
-import './App.scss';
 import AdminDashboard from './features/admin-portal/dashboard/pages/AdminDashboard';
 
 function Layout({ children }: { children: React.ReactNode }) {

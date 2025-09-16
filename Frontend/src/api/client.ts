@@ -27,22 +27,17 @@ apiClient.interceptors.response.use(
   async (error) => {
     if (error.response?.status === 401) {
       alert("Session expired or unauthorized. Please log in again.");
-      
+
       // Clear token from localStorage
       localStorage.removeItem("authToken");
       localStorage.removeItem("persist:root");
-      
-      if (typeof window !== 'undefined' && (window as any).__store__) {
-        const { clearAuth } = await import('../features/auth/slices/authSlice');
+
+      if ((window as any).__store__) {
+        const { clearAuth } = await import("../features/auth/slices/authSlice");
         (window as any).__store__.dispatch(clearAuth());
-        
-        // Also purge persistor if available
-        if ((window as any).__persistor__) {
-          await (window as any).__persistor__.purge();
-        }
       }
-      
-      if (window.location.pathname !== '/login') {
+
+      if (window.location.pathname !== "/login") {
         window.location.href = "/login";
       }
     }
