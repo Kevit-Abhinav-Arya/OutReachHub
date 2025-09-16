@@ -1,0 +1,190 @@
+@use "@/styles/mixins" as *;
+@use "@/styles/variables" as *;
+
+.workspace-card {
+  @include glass-effect;
+  border-radius: 20px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(0, 180, 216, 0.1);
+  position: relative;
+  overflow: hidden;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0, 180, 216, 0.15);
+    border-color: rgba(0, 180, 216, 0.2);
+
+    .workspace-actions {
+      .action-btn {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  }
+}
+
+.workspace-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.workspace-info {
+  flex: 1;
+
+  .workspace-name-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+
+    .workspace-name {
+      color: #64ffda;
+      font-size: 1.4rem;
+      font-weight: 600;
+      margin: 0;
+      text-shadow: 0 2px 8px rgba(0, 180, 216, 0.3);
+    }
+  }
+}
+
+.workspace-actions {
+  display: flex;
+  gap: 0.5rem;
+
+  .action-btn {
+    background: rgba(35, 34, 50, 0.6);
+    border: 1px solid rgba(0, 180, 216, 0.2);
+    color: #e7e0e0;
+    border-radius: 8px;
+    padding: 0.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    opacity: 0.7;
+    transform: translateY(2px);
+
+    &:hover {
+      background: rgba(0, 180, 216, 0.1);
+      border-color: rgba(0, 180, 216, 0.4);
+      color: #64ffda;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 180, 216, 0.2);
+    }
+
+    &.delete {
+      &:hover {
+        background: rgba(239, 68, 68, 0.1);
+        border-color: rgba(239, 68, 68, 0.4);
+        color: #ef4444;
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+      }
+    }
+
+    i {
+      font-size: 0.9rem;
+    }
+  }
+}
+
+.workspace-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(231, 224, 224, 0.1);
+
+  .workspace-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+
+    .owner-info,
+    .created-date {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: rgba(231, 224, 224, 0.6);
+      font-size: 0.85rem;
+
+      i {
+        color: #00b4d8;
+        font-size: 0.8rem;
+        width: 12px;
+      }
+    }
+  }
+}
+
+// Responsive Design
+@media (max-width: 1024px) {
+  .workspace-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .workspace-card {
+    padding: 1rem;
+  }
+
+  .workspace-card-header {
+    flex-direction: column;
+    gap: 1rem;
+
+    .workspace-actions {
+      align-self: flex-end;
+
+      .action-btn {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  }
+
+  .workspace-info {
+    .workspace-name-section {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+
+      .workspace-badges {
+        flex-wrap: wrap;
+      }
+    }
+  }
+
+  .workspace-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .workspace-card {
+    padding: 0.8rem;
+  }
+
+  .workspace-info {
+    .workspace-name-section {
+      .workspace-name {
+        font-size: 1.2rem;
+      }
+    }
+  }
+
+  .workspace-actions {
+    flex-wrap: wrap;
+
+    .action-btn {
+      padding: 0.4rem;
+
+      i {
+        font-size: 0.8rem;
+      }
+    }
+  }
+}
