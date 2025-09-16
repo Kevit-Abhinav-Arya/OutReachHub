@@ -20,7 +20,6 @@ Build a multi-tenant platform with two main portals:
 
 ---
 
-
 ## 🧩 Modules Overview
 
 ### 👨‍💼 Admin Portal
@@ -85,12 +84,14 @@ Steps followed for Git-based project management:
 ### 📇 Contacts Module
 
 - **Contacts List Page**
+
   - Table view of all contacts
   - Actions: View, Edit, Delete
   - Search and pagination
   - "+ Add New Contact" button
 
 - **View Contact Page**
+
   - Shows contact details: Name, Phone, Tags
   - Actions: Edit, Delete
 
@@ -107,4 +108,3 @@ More sections coming soon: CSS/SCSS, JavaScript integration, Backend with MongoD
 ## 🧠 Learning Outcome
 
 By the end of this project, I aim to understand full-stack development, implement a scalable multi-tenant architecture, and integrate modern frontend-backend technologies in a real-world project scenario.
-
