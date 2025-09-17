@@ -1,98 +1,38 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import type { Campaign } from '../types';
+import { 
+  createCampaignAsync,
+  updateCampaignAsync,
+  fetchWorkspaceTags,
+  fetchMessageTemplates
+} from '../slices/campaignsSlice';
+import type { RootState, AppDispatch } from '@/store';
 import './CampaignModal.scss';
 
 interface CampaignModalProps {
   type: 'create' | 'edit';
   campaign?: Campaign;
   onClose: () => void;
-  onSave: (campaign: Partial<Campaign>) => void;
 }
 
-interface MessageTemplate {
-  id: string;
-  name: string;
-  type: 'text' | 'text-image';
-  content: string;
-}
+const CampaignModal: React.FC<CampaignModalProps> = ({ type, campaign, onClose }) => {
+  const dispatch = useDispatch<AppDispatch>();
+  const { workspaceTags, messageTemplates, loading } = useSelector((state: RootState) => state.campaigns);
 
-const CampaignModal: React.FC<CampaignModalProps> = ({ type, campaign, onClose, onSave }) => {
   const [formData, setFormData] = useState({
     name: campaign?.name || '',
-    description: campaign?.description || '',
     targetTags: campaign?.targetTags || [],
-    messageTemplateId: campaign?.messageTemplateId || ''
+    templateId: campaign?.templateId || ''
   });
 
-  const [availableTags] = useState([
-    'Lead', 'Customer', 'Premium', 'Enterprise', 'Tech', 'Support', 
-    'Newsletter', 'Active', 'Inactive', 'VIP', 'Prospect', 'Partner'
-  ]);
-
-  const [messageTemplates] = useState<MessageTemplate[]>([
-    {
-      id: '1',
-      name: 'Summer Launch Template',
-      type: 'text-image',
-      content: 'Check out our amazing summer collection! Limited time offer.'
-    },
-    {
-      id: '2',
-      name: 'Weekly Newsletter Template',
-      type: 'text',
-      content: 'Your weekly update is here with the latest news and updates.'
-    },
-    {
-      id: '3',
-      name: 'Support Follow-up Template',
-      type: 'text',
-      content: 'Thank you for contacting support. How was your experience?'
-    },
-    {
-      id: '4',
-      name: 'Product Launch Template',
-      type: 'text-image',
-      content: 'Introducing our latest product! Be the first to try it.'
-    },
-    {
-      id: '5',
-      name: 'Welcome Message Template',
-      type: 'text',
-      content: 'Welcome to our community! We\'re excited to have you.'
-    }
-  ]);
-
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [contactsCount, setContactsCount] = useState(0);
 
+  // Fetch tags and templates on mount
   useEffect(() => {
-    // Simulate fetching contacts count based on selected tags
-    if (formData.targetTags.length > 0) {
-      // Mock calculation - in real app, this would be an API call
-      const mockContactsPerTag = {
-        'Lead': 45,
-        'Customer': 120,
-        'Premium': 78,
-        'Enterprise': 23,
-        'Tech': 65,
-        'Support': 34,
-        'Newsletter': 200,
-        'Active': 156,
-        'Inactive': 67,
-        'VIP': 29,
-        'Prospect': 89,
-        'Partner': 15
-      };
-      
-      const totalContacts = formData.targetTags.reduce((sum, tag) => {
-        return sum + (mockContactsPerTag[tag as keyof typeof mockContactsPerTag] || 0);
-      }, 0);
-      
-      setContactsCount(Math.max(totalContacts - Math.floor(totalContacts * 0.1), 0)); // Account for overlaps
-    } else {
-      setContactsCount(0);
-    }
-  }, [formData.targetTags]);
+    dispatch(fetchWorkspaceTags());
+    dispatch(fetchMessageTemplates());
+  }, [dispatch]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -128,35 +68,50 @@ const CampaignModal: React.FC<CampaignModalProps> = ({ type, campaign, onClose, 
       newErrors.targetTags = 'At least one target tag must be selected';
     }
 
-    if (!formData.messageTemplateId) {
-      newErrors.messageTemplateId = 'Message template must be selected';
+    if (!formData.templateId) {
+      newErrors.templateId = 'Message template must be selected';
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!validateForm()) {
       return;
     }
 
-    const selectedTemplate = messageTemplates.find(t => t.id === formData.messageTemplateId);
-    
-    const campaignData: Partial<Campaign> = {
-      ...formData,
-      messageTemplateName: selectedTemplate?.name || '',
-      messageTemplateType: selectedTemplate?.type || 'text',
-      contactsTargeted: contactsCount
-    };
-
-    onSave(campaignData);
+    try {
+      if (type === 'create') {
+        await dispatch(createCampaignAsync({
+          name: formData.name.trim(),
+          targetTags: formData.targetTags,
+          templateId: formData.templateId
+        })).unwrap();
+      } else if (campaign) {
+        await dispatch(updateCampaignAsync({
+          id: campaign.id,
+          campaignData: {
+            name: formData.name.trim(),
+            targetTags: formData.targetTags,
+            templateId: formData.templateId
+          }
+        })).unwrap();
+      }
+      onClose();
+    } catch (error) {
+      console.error('Failed to save campaign:', error);
+    }
   };
 
   const getSelectedTemplate = () => {
-    return messageTemplates.find(t => t.id === formData.messageTemplateId);
+    const template = messageTemplates.find((t: any) => t.id === formData.templateId);
+    if (template) {
+      console.log('Selected template:', template); // Debug log
+    }
+    return template;
   };
 
   const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -192,18 +147,6 @@ const CampaignModal: React.FC<CampaignModalProps> = ({ type, campaign, onClose, 
               />
               {errors.name && <span className="error-message">{errors.name}</span>}
             </div>
-
-            <div className="form-group">
-              <label htmlFor="description">Description</label>
-              <textarea
-                id="description"
-                name="description"
-                value={formData.description}
-                onChange={handleInputChange}
-                placeholder="Enter campaign description (optional)"
-                rows={3}
-              />
-            </div>
           </div>
 
           <div className="form-section">
@@ -212,7 +155,7 @@ const CampaignModal: React.FC<CampaignModalProps> = ({ type, campaign, onClose, 
             <div className="form-group">
               <label>Select Tags *</label>
               <div className="tags-grid">
-                {availableTags.map(tag => (
+                {workspaceTags.map((tag: string) => (
                   <label key={tag} className="tag-option">
                     <input
                       type="checkbox"
@@ -224,13 +167,6 @@ const CampaignModal: React.FC<CampaignModalProps> = ({ type, campaign, onClose, 
                 ))}
               </div>
               {errors.targetTags && <span className="error-message">{errors.targetTags}</span>}
-              
-              {contactsCount > 0 && (
-                <div className="contacts-preview">
-                  <i className="fas fa-users"></i>
-                  <span>{contactsCount} contacts will be targeted</span>
-                </div>
-              )}
             </div>
           </div>
 
@@ -238,22 +174,22 @@ const CampaignModal: React.FC<CampaignModalProps> = ({ type, campaign, onClose, 
             <h3>Message Template</h3>
             
             <div className="form-group">
-              <label htmlFor="messageTemplateId">Select Template *</label>
+              <label htmlFor="templateId">Select Template *</label>
               <select
-                id="messageTemplateId"
-                name="messageTemplateId"
-                value={formData.messageTemplateId}
+                id="templateId"
+                name="templateId"
+                value={formData.templateId}
                 onChange={handleInputChange}
-                className={errors.messageTemplateId ? 'error' : ''}
+                className={errors.templateId ? 'error' : ''}
               >
                 <option value="">Choose a message template</option>
-                {messageTemplates.map(template => (
+                {messageTemplates.map((template: any) => (
                   <option key={template.id} value={template.id}>
-                    {template.name} ({template.type === 'text-image' ? 'Text + Image' : 'Text'})
+                    {template.name} ({template.type || 'Text'})
                   </option>
                 ))}
               </select>
-              {errors.messageTemplateId && <span className="error-message">{errors.messageTemplateId}</span>}
+              {errors.templateId && <span className="error-message">{errors.templateId}</span>}
             </div>
 
             {getSelectedTemplate() && (
@@ -262,19 +198,25 @@ const CampaignModal: React.FC<CampaignModalProps> = ({ type, campaign, onClose, 
                 <div className="preview-card">
                   <div className="preview-header">
                     <span className="template-name">{getSelectedTemplate()?.name}</span>
-                    <span>
                     <span className='tag'>
-                      {getSelectedTemplate()?.type === 'text-image' ? 'Text + Image' : 'Text'}
-                    </span>
+                      {getSelectedTemplate()?.type || 'Text'}
                     </span>
                   </div>
                   <div className="preview-content">
-                    {getSelectedTemplate()?.content}
+                    {getSelectedTemplate()?.body || 'No content available'}
                   </div>
-                  {getSelectedTemplate()?.type === 'text-image' && (
-                    <div className="preview-image-placeholder">
-                      <i className="fas fa-image"></i>
-                      <span>Image will be included</span>
+                  {getSelectedTemplate()?.type === 'Text & Image' && (
+                    <div className="preview-image">
+                      {getSelectedTemplate()?.imageUrl ? (
+                        <div className="actual-image-preview">
+                          <img src={getSelectedTemplate()?.imageUrl} alt="Template preview" />
+                        </div>
+                      ) : (
+                        <div className="preview-image-placeholder">
+                          <i className="fas fa-image"></i>
+                          <span>No image uploaded</span>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
@@ -296,10 +238,6 @@ const CampaignModal: React.FC<CampaignModalProps> = ({ type, campaign, onClose, 
                 </span>
               </div>
               <div className="summary-item">
-                <span className="summary-label">Contacts Targeted:</span>
-                <span className="summary-value">{contactsCount}</span>
-              </div>
-              <div className="summary-item">
                 <span className="summary-label">Message Template:</span>
                 <span className="summary-value">{getSelectedTemplate()?.name || 'None selected'}</span>
               </div>
@@ -311,8 +249,13 @@ const CampaignModal: React.FC<CampaignModalProps> = ({ type, campaign, onClose, 
           <button type="button" className="cancel-btn" onClick={onClose}>
             Cancel
           </button>
-          <button type="submit" className="save-btn" onClick={handleSubmit}>
-            {type === 'create' ? 'Create Campaign' : 'Save Changes'}
+          <button 
+            type="submit" 
+            className="save-btn" 
+            onClick={handleSubmit}
+            disabled={loading}
+          >
+            {loading ? 'Saving...' : (type === 'create' ? 'Create Campaign' : 'Save Changes')}
           </button>
         </div>
       </div>

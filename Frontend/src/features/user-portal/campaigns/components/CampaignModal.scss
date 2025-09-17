@@ -189,64 +189,6 @@
     }
   }
 
-  select {
-    width: 100%;
-    padding: 0.8rem 1rem;
-    border-radius: 10px;
-    border: 1px solid rgba(0, 180, 216, 0.2);
-    background: rgba(35, 34, 50, 0.1);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    color: #e7e0e0;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-    cursor: pointer;
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2364ffda' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
-    background-position: right 0.8rem center;
-    background-repeat: no-repeat;
-    background-size: 1.5em 1.5em;
-    padding-right: 2.5rem;
-
-    &:focus {
-      outline: none;
-      border-color: rgba(0, 180, 216, 0.5);
-      box-shadow:
-        0 0 0 3px rgba(0, 180, 216, 0.1),
-        0 4px 20px rgba(0, 180, 216, 0.2),
-        inset 0 0 20px rgba(0, 180, 216, 0.1);
-    }
-
-    &.error {
-      border-color: #ef4444;
-      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23ef4444' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
-    }
-
-    &:hover {
-      border-color: rgba(0, 180, 216, 0.4);
-      background: rgba(0, 180, 216, 0.05);
-    }
-
-    option {
-      background: rgba(35, 34, 50, 0.95);
-      color: #e7e0e0;
-      padding: 0.5rem;
-      border: none;
-
-      &:hover,
-      &:focus,
-      &:checked {
-        background: rgba(0, 180, 216, 0.2);
-        color: #64ffda;
-      }
-
-      &:disabled {
-        color: rgba(231, 224, 224, 0.4);
-      }
-    }
-  }
 
   textarea {
     resize: vertical;
@@ -414,6 +356,22 @@
       line-height: 1.5;
     }
 
+    .preview-image {
+      border-top: 1px solid rgba(100, 255, 218, 0.2);
+      
+      .actual-image-preview {
+        padding: 1rem;
+        
+        img {
+          width: 100%;
+          max-height: 200px;
+          object-fit: cover;
+          border-radius: 8px;
+          border: 1px solid rgba(100, 255, 218, 0.3);
+        }
+      }
+    }
+
     .preview-image-placeholder {
       display: flex;
       align-items: center;
@@ -472,7 +430,6 @@
   }
 }
 
-// Confirm Modal Styles
 .modal.confirm-modal {
   width: 90%;
   max-width: 500px;

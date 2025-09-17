@@ -6,23 +6,32 @@ interface CampaignCardProps {
   campaign: Campaign;
   canEdit: boolean;
   onAction: (campaign: Campaign, action: 'view' | 'edit' | 'delete' | 'copy' | 'launch') => void;
+  progress?: {
+    status: 'launching' | 'running' | 'completed';
+    progress: number;
+    startTime?: number;
+  };
 }
 
-const CampaignCard: React.FC<CampaignCardProps> = ({ campaign, canEdit, onAction }) => {
+const CampaignCard: React.FC<CampaignCardProps> = ({ campaign, canEdit, onAction, progress }) => {
+  // Debug log for campaign template data
+  console.log('Campaign template data:', {
+    templateId: campaign.templateId,
+    template: campaign.template,
+    hasTemplate: !!campaign.template,
+    templateType: campaign.template?.type,
+    hasImageUrl: !!campaign.template?.imageUrl,
+    imageUrl: campaign.template?.imageUrl
+  });
  
 
   const getStatusIcon = (status: Campaign['status']) => {
     switch (status) {
-      case 'draft': return 'fa-edit';
-      case 'running': return 'fa-play-circle';
-      case 'completed': return 'fa-check-circle';
+      case 'Draft': return 'fa-edit';
+      case 'Running': return 'fa-play-circle';
+      case 'Completed': return 'fa-check-circle';
       default: return 'fa-circle';
     }
-  };
-
-  const getDeliveryRate = () => {
-    if (campaign.messagesSent === 0) return 0;
-    return Math.round((campaign.messagesDelivered / campaign.messagesSent) * 100);
   };
 
   const formatDate = (dateString: string) => {
@@ -35,6 +44,9 @@ const CampaignCard: React.FC<CampaignCardProps> = ({ campaign, canEdit, onAction
     });
   };
 
+  const currentProgress = progress?.progress || (campaign.status === 'Running' ? 50 : 0);
+  const showProgress = campaign.status === 'Running' || progress?.status === 'running' || progress?.status === 'launching';
+
   return (
     <div className="campaign-card">
       <div className="campaign-header">
@@ -42,10 +54,10 @@ const CampaignCard: React.FC<CampaignCardProps> = ({ campaign, canEdit, onAction
           <h3>{campaign.name}</h3>
           <div className="campaign-status">
             <span 
-              className={`status-badge ${campaign.status}`}
+              className={`status-badge ${campaign.status.toLowerCase()}`}
             >
               <i className={`fas ${getStatusIcon(campaign.status)}`}></i>
-              {campaign.status.charAt(0).toUpperCase() + campaign.status.slice(1)}
+              {campaign.status}
             </span>
           </div>
         </div>
@@ -59,7 +71,7 @@ const CampaignCard: React.FC<CampaignCardProps> = ({ campaign, canEdit, onAction
             <i className="fas fa-eye"></i>
           </button>
           
-          {canEdit && campaign.status === 'draft' && (
+          {canEdit && campaign.status === 'Draft' && (
             <>
               <button 
                 className="action-btn edit-btn" 
@@ -88,7 +100,7 @@ const CampaignCard: React.FC<CampaignCardProps> = ({ campaign, canEdit, onAction
           </button>
           )}
           
-          {canEdit && campaign.status === 'draft' && (
+          {canEdit && campaign.status === 'Draft' && (
             <button 
               className="action-btn delete-btn" 
               onClick={() => onAction(campaign, 'delete')}
@@ -100,19 +112,15 @@ const CampaignCard: React.FC<CampaignCardProps> = ({ campaign, canEdit, onAction
         </div>
       </div>
 
-      {campaign.description && (
-        <p className="campaign-description">{campaign.description}</p>
-      )}
-
       <div className="campaign-details">
         <div className="detail-row">
           <div className="detail-item">
             <i className="fas fa-tags"></i>
             <span className="detail-label">Target Tags:</span>
             <div className="tags-container">
-              {campaign.targetTags.map((tag, index) => (
+              {campaign.targetTags?.map((tag, index) => (
                 <span key={index} className="tag">{tag}</span>
-              ))}
+              )) || <span className="tag">No tags</span>}
             </div>
           </div>
         </div>
@@ -122,46 +130,68 @@ const CampaignCard: React.FC<CampaignCardProps> = ({ campaign, canEdit, onAction
             <i className="fas fa-envelope"></i>
             <span className="detail-label">Template:</span>
             <span className="detail-value">
-              {campaign.messageTemplateName}
+              {campaign.template?.name || 'Unknown Template'}
               <span className='tags-container'>
               <span className="tag">
-                {campaign.messageTemplateType === 'text-image' ? 'Text + Image' : 'Text'}
+                {campaign.template?.type || 'Text'}
               </span>
               </span>
             </span>
           </div>
         </div>
+
+        {campaign.template?.imageUrl && campaign.template.type === 'Text & Image' && (
+          <div className="detail-row">
+            <div className="detail-item template-image-preview">
+              <i className="fas fa-image"></i><span className="detail-label">Template Image:</span>
+              
+              <div className="image-thumbnail">
+                <img 
+                  src={campaign.template.imageUrl} 
+                  alt="Template" 
+                  onLoad={() => console.log('Image loaded successfully:', campaign.template?.imageUrl)}
+                  onError={(e) => console.error('Image failed to load:', campaign.template?.imageUrl, e)}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {campaign.template?.body && (
+          <div className="detail-row">
+            <div className="detail-item template-content">
+              <i className="fas fa-comment-alt"></i>
+              <span className="detail-label">Template Content:</span>
+              <div className="template-body">
+                {campaign.template.body}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {(() => {
+          console.log('Image render conditions:', {
+            hasImageUrl: !!campaign.template?.imageUrl,
+            isTextAndImage: campaign.template?.type === 'Text & Image',
+            shouldRender: campaign.template?.imageUrl && campaign.template.type === 'Text & Image'
+          });
+          return null;
+        })()}
       </div>
 
-      <div className="campaign-stats">
-        <div className="stat-item">
-          <div className="stat-number">{campaign.contactsTargeted}</div>
-          <div className="stat-label">Targeted</div>
-        </div>
-        <div className="stat-item">
-          <div className="stat-number">{campaign.messagesSent}</div>
-          <div className="stat-label">Sent</div>
-        </div>
-        <div className="stat-item">
-          <div className="stat-number">{campaign.messagesDelivered}</div>
-          <div className="stat-label">Delivered</div>
-        </div>
-        <div className="stat-item">
-          <div className="stat-number">{getDeliveryRate()}%</div>
-          <div className="stat-label">Success Rate</div>
-        </div>
-      </div>
-
-      {campaign.status === 'running' && campaign.progress !== undefined && (
+      {showProgress && (
         <div className="progress-section">
           <div className="progress-header">
-            <span>Progress</span>
-            <span>{Math.round(campaign.progress)}%</span>
+            <span>
+              {progress?.status === 'launching' ? 'Launching...' : 
+               progress?.status === 'running' ? 'In Progress' : 'Progress'}
+            </span>
+            <span>{Math.round(currentProgress)}%</span>
           </div>
           <div className="progress-bar">
             <div 
               className="progress-fill" 
-              style={{ width: `${campaign.progress}%` }}
+              style={{ width: `${currentProgress}%` }}
             ></div>
           </div>
         </div>
@@ -172,16 +202,16 @@ const CampaignCard: React.FC<CampaignCardProps> = ({ campaign, canEdit, onAction
           <i className="fas fa-calendar-plus"></i>
           <span>Created: {formatDate(campaign.createdAt)}</span>
         </div>
+        {campaign.createdBy && (
+          <div className="footer-item">
+            <i className="fas fa-user"></i>
+            <span>By: {campaign.createdBy.name}</span>
+          </div>
+        )}
         {campaign.launchedAt && (
           <div className="footer-item">
             <i className="fas fa-rocket"></i>
             <span>Launched: {formatDate(campaign.launchedAt)}</span>
-          </div>
-        )}
-        {campaign.completedAt && (
-          <div className="footer-item">
-            <i className="fas fa-check"></i>
-            <span>Completed: {formatDate(campaign.completedAt)}</span>
           </div>
         )}
       </div>

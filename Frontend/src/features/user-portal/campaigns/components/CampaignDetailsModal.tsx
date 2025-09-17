@@ -1,5 +1,7 @@
 import React from 'react';
+import { useSelector } from 'react-redux';
 import type { Campaign } from '../types';
+import type { RootState } from '@/store';
 import './CampaignDetailsModal.scss';
 
 interface CampaignDetailsModalProps {
@@ -8,6 +10,7 @@ interface CampaignDetailsModalProps {
 }
 
 const CampaignDetailsModal: React.FC<CampaignDetailsModalProps> = ({ campaign, onClose }) => {
+  const { campaignProgress } = useSelector((state: RootState) => state.campaigns);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -19,25 +22,27 @@ const CampaignDetailsModal: React.FC<CampaignDetailsModalProps> = ({ campaign, o
     });
   };
 
-    const getStatusColor = (status: Campaign['status']) => {
-        switch (status) {
-        case 'draft': return '#ffd700';
-        case 'running': return '#00b4d8';
-        case 'completed': return '#4ade80';
-        default: return '#64ffda';
-        }
-    };
+  const getStatusColor = (status: Campaign['status']) => {
+    switch (status) {
+      case 'Draft': return '#ffd700';
+      case 'Running': return '#00b4d8';
+      case 'Completed': return '#4ade80';
+      default: return '#64ffda';
+    }
+  };
 
   const getStatusIcon = (status: Campaign['status']) => {
     switch (status) {
-      case 'draft': return 'fa-edit';
-      case 'running': return 'fa-play-circle';
-      case 'completed': return 'fa-check-circle';
+      case 'Draft': return 'fa-edit';
+      case 'Running': return 'fa-play-circle';
+      case 'Completed': return 'fa-check-circle';
       default: return 'fa-circle';
     }
   };
 
-
+  const progress = campaignProgress[campaign.id];
+  const showProgress = campaign.status === 'Running' || progress?.status === 'running' || progress?.status === 'launching';
+  const currentProgress = progress?.progress || (campaign.status === 'Running' ? 50 : 0);
 
   const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) {
@@ -53,11 +58,11 @@ const CampaignDetailsModal: React.FC<CampaignDetailsModalProps> = ({ campaign, o
             <h2>{campaign.name}</h2>
             <div className="campaign-status">
               <span 
-                className={`status-badge ${campaign.status}`}
-                style={{ backgroundColor:   getStatusColor(campaign.status) }}
+                className={`status-badge ${campaign.status.toLowerCase()}`}
+                style={{ backgroundColor: getStatusColor(campaign.status) }}
               >
                 <i className={`fas ${getStatusIcon(campaign.status)}`}></i>
-                {campaign.status.charAt(0).toUpperCase() + campaign.status.slice(1)}
+                {campaign.status}
               </span>
             </div>
           </div>
@@ -68,71 +73,30 @@ const CampaignDetailsModal: React.FC<CampaignDetailsModalProps> = ({ campaign, o
 
         <div className="modal-body">
             <div className="overview-content">
-              {campaign.progress !== undefined && campaign.status === 'running' && (
+              {showProgress && (
                 <div className="progress-section">
                   <div className="progress-header">
                     <h3>Campaign Progress</h3>
-                    <span>{Math.round(campaign.progress)}%</span>
+                    <span>{Math.round(currentProgress)}%</span>
                   </div>
                   <div className="progress-bar">
                     <div 
                       className="progress-fill" 
-                      style={{ width: `${campaign.progress}%` }}
+                      style={{ width: `${currentProgress}%` }}
                     ></div>
                   </div>
                   <p className="progress-text">
-                    {campaign.progress < 100 ? 'Campaign is currently running...' : 'Campaign completed!'}
+                    {progress?.status === 'launching' ? 'Campaign is launching...' :
+                     progress?.status === 'running' ? 'Campaign is currently running...' :
+                     currentProgress >= 100 ? 'Campaign completed!' : 'Campaign in progress...'}
                   </p>
                 </div>
               )}
-
-              <div className="stats-grid">
-                <div className="stat-card">
-                  <div className="stat-icon">
-                    <i className="fas fa-users"></i>
-                  </div>
-                  <div className="stat-content">
-                    <h3>{campaign.contactsTargeted}</h3>
-                    <p>Contacts Targeted</p>
-                  </div>
-                </div>
-                <div className="stat-card">
-                  <div className="stat-icon">
-                    <i className="fas fa-paper-plane"></i>
-                  </div>
-                  <div className="stat-content">
-                    <h3>{campaign.messagesSent}</h3>
-                    <p>Messages Sent</p>
-                  </div>
-                </div>
-                <div className="stat-card">
-                  <div className="stat-icon">
-                    <i className="fas fa-check"></i>
-                  </div>
-                  <div className="stat-content">
-                    <h3>{campaign.messagesDelivered}</h3>
-                    <p>Messages Delivered</p>
-                  </div>
-                </div>
-                <div className="stat-card">
-                  <div className="stat-icon">
-                    <i className="fas fa-exclamation-triangle"></i>
-                  </div>
-                  <div className="stat-content">
-                    <h3>{campaign.messagesFailed}</h3>
-                    <p>Messages Failed</p>
-                  </div>
-                </div>
-              </div>
 
               <div className="campaign-info">
                 <div className="info-section">
                   <h3>Campaign Details</h3>
                   <div className="info-grid">
-                    <div className="info-item">
-                      <span className="info-label">Description:</span>
-                      <span className="info-value">{campaign.description || 'No description'}</span>
-                    </div>
                     <div className="info-item">
                       <span className="info-label">Target Tags:</span>
                       <div className="tags-container">
@@ -144,15 +108,36 @@ const CampaignDetailsModal: React.FC<CampaignDetailsModalProps> = ({ campaign, o
                     <div className="info-item">
                       <span className="info-label">Message Template:</span>
                       <span className="info-value">
-                        {campaign.messageTemplateName}
+                        {campaign.template?.name || 'Unknown Template'}
                         <span className='tags-container'>
                         <span className='tag'>
-                          {campaign.messageTemplateType === 'text-image' ? 'Text + Image' : 'Text'}
+                          {campaign.template?.type || 'Text'}
                         </span>
                         </span>
-
                       </span>
                     </div>
+                    {campaign.template?.imageUrl && campaign.template.type === 'Text & Image' && (
+                      <div className="info-item template-image-item">
+                        <span className="info-label">Template Image:</span>
+                        <div className="template-image-preview">
+                          <img src={campaign.template.imageUrl} alt="Template" />
+                        </div>
+                      </div>
+                    )}
+                    {campaign.template?.body && (
+                      <div className="info-item template-content-item">
+                        <span className="info-label">Template Content:</span>
+                        <div className="template-content">
+                          {campaign.template.body}
+                        </div>
+                      </div>
+                    )}
+                    {campaign.createdBy && (
+                      <div className="info-item">
+                        <span className="info-label">Created By:</span>
+                        <span className="info-value">{campaign.createdBy.name}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -179,14 +164,14 @@ const CampaignDetailsModal: React.FC<CampaignDetailsModalProps> = ({ campaign, o
                         </div>
                       </div>
                     )}
-                    {campaign.completedAt && (
+                    {campaign.status === 'Completed' && (
                       <div className="timeline-item">
                         <div className="timeline-icon completed">
                           <i className="fas fa-check"></i>
                         </div>
                         <div className="timeline-content">
                           <h4>Campaign Completed</h4>
-                          <p>{formatDate(campaign.completedAt)}</p>
+                          <p>Status: {campaign.status}</p>
                         </div>
                       </div>
                     )}
