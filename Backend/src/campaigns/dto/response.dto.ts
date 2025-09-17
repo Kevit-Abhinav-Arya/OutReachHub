@@ -47,9 +47,12 @@ export interface CampaignSummaryDto {
   name: string;
   targetTags: string[];
   templateId: string;
+  template?: CampaignTemplateDto;
   status: 'Draft' | 'Running' | 'Completed';
-  targetContactsCount: number;
+  targetContactsCount?: number;
+  createdBy?: CampaignCreatorDto;
   createdAt: Date;
+  launchedAt?: Date;
 }
 
 // API Response interfaces

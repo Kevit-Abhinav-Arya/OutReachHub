@@ -21,14 +21,17 @@ export class UsersService {
   async createUser(createUserDto: CreateUserDto) {
     const { name, email, password } = createUserDto;
 
+    // Check if user already exists
     const existingUser = await this.queriesService.getUserByEmail(email);
     if (existingUser) {
       throw new ConflictException('User with this email already exists');
     }
 
+    // Hash password
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
+    // Prepare user data
     const userData = {
       name,
       email,
@@ -38,7 +41,7 @@ export class UsersService {
 
     const newUser = await this.queriesService.createUser(userData);
 
-    // Removing password from response
+    // Remove password from response
     const { password: _, ...userResponse } = newUser.toObject();
 
     return {
@@ -61,7 +64,7 @@ export class UsersService {
       totalUsers = await this.queriesService.getAllUsersCount();
     }
 
-    // Removing passwords from response
+    // Remove passwords from response
     const usersResponse = users.map((user) => {
       const { password: _, ...userData } = user.toObject();
       return userData;
@@ -158,6 +161,7 @@ export class UsersService {
       throw new NotFoundException('User not found');
     }
 
+    // Check if user is already in workspace
     const isAlreadyInWorkspace = user.workspaces.some(
       (w) => w.workspaceId._id.toString() === workspaceId,
     );

@@ -5,5 +5,5 @@ export class CopyCampaignDto {
   @IsOptional()
   @IsString()
   @Transform(({ value }) => value?.trim())
-  name?: string;
+  newName?: string;
 }

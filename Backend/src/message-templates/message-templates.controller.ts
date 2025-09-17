@@ -64,6 +64,7 @@ export class MessageTemplatesController {
     );
   }
 
+  // Upload Image for Template
   @Post('upload-image')
   @UseGuards(EditorGuard)
   @UseInterceptors(FileInterceptor('image', multerConfig))
@@ -76,10 +77,11 @@ export class MessageTemplatesController {
       throw new BadRequestException('No image file provided');
     }
 
+    // Return the full image URL
     const protocol = req.protocol;
     const host = req.get('Host');
     const imageUrl = `${protocol}://${host}/uploads/message-templates/${file.filename}`;
-
+    
     return {
       success: true,
       message: 'Image uploaded successfully',
@@ -91,6 +93,7 @@ export class MessageTemplatesController {
     };
   }
 
+  // Get All Templates
   @Get()
   @UseGuards(ViewerGuard)
   async getAllTemplates(

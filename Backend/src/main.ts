@@ -10,11 +10,13 @@ async function bootstrap() {
   // Global prefix
   app.setGlobalPrefix('api');
 
+  // Serve static files for uploaded images
   app.useStaticAssets(join(__dirname, '..', 'uploads'), {
     prefix: '/uploads/',
-    setHeaders: (res) => {
+    setHeaders: (res, path) => {
+      // Security headers for images
       res.setHeader('X-Content-Type-Options', 'nosniff');
-      res.setHeader('Cache-Control', 'public, max-age=31536000');
+      res.setHeader('Cache-Control', 'public, max-age=31536000'); // 1 year cache
     },
   });
 

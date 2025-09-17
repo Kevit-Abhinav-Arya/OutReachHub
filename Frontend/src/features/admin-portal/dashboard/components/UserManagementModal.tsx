@@ -90,7 +90,6 @@ const UserManagementModal: React.FC<UserManagementModalProps> = ({
     try {
       await onUpdateUser(editingUser.id, {
         name: editingUser.name,
-        email: editingUser.email,
         role: editingUser.role
       });
 
@@ -150,9 +149,7 @@ const UserManagementModal: React.FC<UserManagementModalProps> = ({
     }
   };
 
-  // Handle clicks outside the modal to close it
   const handleOverlayClick = (event: React.MouseEvent<HTMLDivElement>) => {
-    // Only close if the click is directly on the overlay, not on its children
     if (event.target === event.currentTarget) {
       onClose();
     }
@@ -256,12 +253,10 @@ const UserManagementModal: React.FC<UserManagementModalProps> = ({
         </div>
       </div>
 
-      {/* Edit User Modal */}
       {isEditModalOpen && editingUser && (
         <div 
           className="modal-overlay edit-modal-overlay"
           onClick={(event) => {
-            // Only close if the click is directly on the overlay
             if (event.target === event.currentTarget) {
               setIsEditModalOpen(false);
               setEditingUser(null);
