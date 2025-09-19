@@ -11,6 +11,7 @@ import {
 } from '../slices/authSlice';
 import { FormField } from '../components/FormField';
 import './Login.scss';
+import { toast } from 'react-toastify';
 
 const Login: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -50,7 +51,7 @@ const Login: React.FC = () => {
       ...prev,
       [name]: value
     }));
-    // Clear local form error when user starts typing
+
     if (formErrors[name]) {
       setFormErrors(prev => ({
         ...prev,
@@ -73,8 +74,11 @@ const Login: React.FC = () => {
     }
     
     setFormErrors(newErrors);
+    console.log(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -88,19 +92,24 @@ const Login: React.FC = () => {
         const result = await dispatch(adminLogin(formData));
         if (adminLogin.fulfilled.match(result)) {
           // Get return URL or default to admin dashboard
-          
+          toast.success("Login Succesful");
           navigate("/admin", { replace: true });
         }
       } else {
         const result = await dispatch(userLogin(formData));
         if (userLogin.fulfilled.match(result)) {
+                                toast.success("Login Succesful");
+
           if (!result.payload.requiresWorkspaceSelection) {
             const from = (location.state as any)?.from?.pathname || '/';
+                      toast.success("Login Succesful");
+
             navigate(from, { replace: true });
           }
         }
       }
     } catch (error) {
+      toast(String(error));
       console.error('Login failed:', error);
     }
   };

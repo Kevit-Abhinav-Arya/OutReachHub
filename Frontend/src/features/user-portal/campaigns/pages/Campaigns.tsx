@@ -32,13 +32,30 @@ const Campaigns: React.FC = () => {
   const [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(null);
   const [modalType, setModalType] = useState<'view' | 'edit' | 'delete' | 'copy' | 'launch' | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
+  
   const [currentPage, setCurrentPage] = useState(1);
   const [copyName, setCopyName] = useState('');
 
-  // Fetch campaigns on component mount
-  useEffect(() => {
-    dispatch(fetchCampaigns({ page: currentPage, limit: 10, search: searchTerm }));
-  }, [dispatch, currentPage, searchTerm]);
+  // Debounce search term
+    useEffect(() => {
+      const timer = setTimeout(() => {
+        setDebouncedSearchTerm(searchTerm);
+        if (searchTerm !== debouncedSearchTerm) {
+          pagination.page
+        }
+      }, 300);
+  
+      return () => clearTimeout(timer);
+    }, [searchTerm, debouncedSearchTerm]);
+        useEffect(() => {
+          dispatch(fetchCampaigns({ 
+            page: pagination.page, 
+            limit: 10,
+            search: debouncedSearchTerm || undefined 
+          }));
+        }, [dispatch, pagination.page, debouncedSearchTerm]);
+
 
   // Clear error when component unmounts
   useEffect(() => {
@@ -175,7 +192,7 @@ const Campaigns: React.FC = () => {
 
   return (
     <main className="campaigns-container">
-      {/* Header Section */}
+      {/* Header Section */} 
       <div className="campaigns-header">
         <div className="header-content">
           <h1>Campaigns</h1>

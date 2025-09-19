@@ -9,10 +9,9 @@ import {
   createMessageTemplate,
   updateMessageTemplate,
   deleteMessageTemplate,
-  setSearch,
   setPage,
   selectTemplate,
-  clearSelectedTemplate,
+  clearSelectedTemplate, 
   selectMessageTemplates,
   selectSelectedTemplate,
   selectPagination,
@@ -35,6 +34,10 @@ const MessageTemplates: React.FC = () => {
   const filters = useSelector(selectFilters);
   const loading = useSelector(selectLoading);
   const errors = useSelector(selectErrors);
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  
+  
 
   // Local modal state
   const [modalType, setModalType] = useState<'view' | 'edit' | 'delete' | 'copy' | 'create' | null>(null);
@@ -55,16 +58,26 @@ const MessageTemplates: React.FC = () => {
     imageUrl: null as string | null,
   });
 
-  // Fetch templates on component mount and when filters change
-  useEffect(() => {
-    const query = {
-      page: pagination.page,
-      limit: pagination.limit,
-      search: filters.search || undefined,
-      type: filters.type !== 'all' ? filters.type : undefined,
-    };
-    dispatch(fetchMessageTemplates(query));
-  }, [dispatch, pagination.page, pagination.limit, filters.search, filters.type]);
+
+   // Debounce search term
+    useEffect(() => {
+      const timer = setTimeout(() => {
+        setDebouncedSearchTerm(searchTerm);
+        if (searchTerm !== debouncedSearchTerm) {
+          pagination.page
+        }
+      }, 300);
+  
+      return () => clearTimeout(timer);
+    }, [searchTerm, debouncedSearchTerm]);
+     useEffect(() => {
+          dispatch(fetchMessageTemplates({ 
+            page: pagination.page, 
+            limit: 10,
+            search: debouncedSearchTerm || undefined 
+          }));
+        }, [dispatch, pagination.page, debouncedSearchTerm]);
+
 
   const handleTemplateAction = (template: MessageTemplate, action: 'view' | 'edit' | 'delete' | 'copy') => {
     // Prevent viewers from performing restricted actions
@@ -194,17 +207,14 @@ const MessageTemplates: React.FC = () => {
     }
   };
 
-  const handleSearch = (value: string) => {
-    dispatch(setSearch(value));
-  };
 
   const handlePageChange = (page: number) => {
     dispatch(setPage(page));
   };
 
   const filteredTemplates = templates.filter((template: MessageTemplate) => {
-    const matchesSearch = template.name.toLowerCase().includes(filters.search.toLowerCase()) ||
-                         template.body.toLowerCase().includes(filters.search.toLowerCase());
+    const matchesSearch = template.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         template.body.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesSearch;
   });
 
@@ -238,8 +248,9 @@ const MessageTemplates: React.FC = () => {
           <input
             type="text"
             placeholder="Search templates by name or content..."
-            value={filters.search}
-            onChange={(e) => handleSearch(e.target.value)}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+
           />
         </div>
       </div>
@@ -279,13 +290,8 @@ const MessageTemplates: React.FC = () => {
               <i className="fas fa-file-alt"></i>
             </div>
             <h3>No templates found</h3>
-            <p>
-              {filters.search 
-                ? 'Try adjusting your search'
-                : 'Create your first message template to get started'
-              }
-            </p>
-            {!filters.search && canEdit && (
+            
+            {canEdit && (
               <button 
                 className="btn-primary"
                 onClick={() => setModalType('create')}

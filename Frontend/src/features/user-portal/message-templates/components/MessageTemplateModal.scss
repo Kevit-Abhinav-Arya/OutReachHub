@@ -20,9 +20,7 @@
   -webkit-backdrop-filter: blur(15px);
   border: 1px solid rgba(0, 180, 216, 0.2);
   border-radius: 20px;
-  box-shadow:
-    0 20px 40px rgba(0, 0, 0, 0.3),
-    0 8px 32px rgba(0, 180, 216, 0.1),
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 8px 32px rgba(0, 180, 216, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
   width: 90%;
   max-width: 600px;
@@ -137,6 +135,7 @@
     }
 
     span {
+      overflow-wrap: break-word !important;
       color: #e7e0e0;
       font-size: 1rem;
       line-height: 1.5;
@@ -228,6 +227,7 @@
 
     input[type="text"],
     input[type="email"],
+    input[type="tel"],
     select,
     textarea {
       width: 100%;
@@ -244,8 +244,7 @@
       &:focus {
         outline: none;
         border-color: rgba(0, 180, 216, 0.5);
-        box-shadow:
-          0 0 0 3px rgba(0, 180, 216, 0.1),
+        box-shadow: 0 0 0 3px rgba(0, 180, 216, 0.1),
           0 4px 20px rgba(0, 180, 216, 0.2),
           inset 0 0 20px rgba(0, 180, 216, 0.1);
         background: rgba(35, 34, 50, 0.8);
@@ -544,6 +543,7 @@
 
       input[type="text"],
       input[type="email"],
+      input[type="tel"],
       select,
       textarea {
         padding: 0.7rem 0.9rem;
@@ -632,6 +632,7 @@
 
       input[type="text"],
       input[type="email"],
+      input[type="tel"],
       select,
       textarea {
         padding: 0.6rem 0.7rem;
@@ -652,6 +653,7 @@
 
   .template-details .detail-row {
     margin-bottom: 1rem;
+    overflow-wrap: break-word !important;
 
     label {
       font-size: 0.9rem;

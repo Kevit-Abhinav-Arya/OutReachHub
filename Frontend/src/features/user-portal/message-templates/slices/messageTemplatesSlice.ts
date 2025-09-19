@@ -1,81 +1,105 @@
-import { createSlice, createAsyncThunk, type PayloadAction } from '@reduxjs/toolkit';
-import * as messageTemplatesApi from '@/api/features/messageTemplatesApi';
-import type { 
+import {
+  createSlice,
+  createAsyncThunk,
+  type PayloadAction,
+} from "@reduxjs/toolkit";
+import * as messageTemplatesApi from "@/api/features/messageTemplatesApi";
+import type {
   MessageTemplate,
   CreateTemplateRequest,
   UpdateTemplateRequest,
   GetTemplatesQuery,
-} from '../types';
+} from "../types";
 
 // Async thunks for message templates API calls
 export const fetchMessageTemplates = createAsyncThunk(
-  'messageTemplates/fetchMessageTemplates',
+  "messageTemplates/fetchMessageTemplates",
   async (query: GetTemplatesQuery = {}, { rejectWithValue }) => {
     try {
       const response = await messageTemplatesApi.getMessageTemplates(query);
       return response;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to fetch templates');
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch templates"
+      );
     }
   }
 );
 
 export const fetchMessageTemplateById = createAsyncThunk(
-  'messageTemplates/fetchMessageTemplateById',
+  "messageTemplates/fetchMessageTemplateById",
   async (id: string, { rejectWithValue }) => {
     try {
       const response = await messageTemplatesApi.getMessageTemplate(id);
       return response.template;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to fetch template');
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch template"
+      );
     }
   }
 );
 
 export const createMessageTemplate = createAsyncThunk(
-  'messageTemplates/createMessageTemplate',
+  "messageTemplates/createMessageTemplate",
   async (templateData: CreateTemplateRequest, { rejectWithValue }) => {
     try {
-      const response = await messageTemplatesApi.createMessageTemplate(templateData);
+      const response = await messageTemplatesApi.createMessageTemplate(
+        templateData
+      );
       return response.template;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to create template');
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to create template"
+      );
     }
   }
 );
 
 export const updateMessageTemplate = createAsyncThunk(
-  'messageTemplates/updateMessageTemplate',
-  async ({ id, templateData }: { id: string; templateData: UpdateTemplateRequest }, { rejectWithValue }) => {
+  "messageTemplates/updateMessageTemplate",
+  async (
+    { id, templateData }: { id: string; templateData: UpdateTemplateRequest },
+    { rejectWithValue }
+  ) => {
     try {
-      const response = await messageTemplatesApi.updateMessageTemplate(id, templateData);
+      const response = await messageTemplatesApi.updateMessageTemplate(
+        id,
+        templateData
+      );
       return response.template;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to update template');
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to update template"
+      );
     }
   }
 );
 
 export const deleteMessageTemplate = createAsyncThunk(
-  'messageTemplates/deleteMessageTemplate',
+  "messageTemplates/deleteMessageTemplate",
   async (id: string, { rejectWithValue }) => {
     try {
       await messageTemplatesApi.deleteMessageTemplate(id);
       return id;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to delete template');
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to delete template"
+      );
     }
   }
 );
 
 export const uploadTemplateImage = createAsyncThunk(
-  'messageTemplates/uploadTemplateImage',
+  "messageTemplates/uploadTemplateImage",
   async (file: File, { rejectWithValue }) => {
     try {
       const response = await messageTemplatesApi.uploadTemplateImage(file);
       return response.data.imageUrl;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to upload image');
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to upload image"
+      );
     }
   }
 );
@@ -84,19 +108,19 @@ export const uploadTemplateImage = createAsyncThunk(
 interface MessageTemplatesState {
   templates: MessageTemplate[];
   selectedTemplate: MessageTemplate | null;
-  
+
   pagination: {
     page: number;
     limit: number;
     total: number;
     totalPages: number;
   };
-  
-  filters: {
-    search: string;
-    type: 'Text' | 'Text & Image' | 'all';
-  };
-  
+
+  // filters: {
+  //   search: string;
+  //   type: 'Text' | 'Text & Image' | 'all';
+  // };
+
   // Loading states
   loading: {
     list: boolean;
@@ -106,7 +130,7 @@ interface MessageTemplatesState {
     fetch: boolean;
     upload: boolean;
   };
-  
+
   // Error states
   error: {
     list: string | null;
@@ -121,19 +145,19 @@ interface MessageTemplatesState {
 const initialState: MessageTemplatesState = {
   templates: [],
   selectedTemplate: null,
-  
+
   pagination: {
     page: 1,
     limit: 10,
     total: 0,
     totalPages: 0,
   },
-  
-  filters: {
-    search: '',
-    type: 'all',
-  },
-  
+
+  // filters: {
+  //   search: '',
+  //   type: 'all',
+  // },
+
   loading: {
     list: false,
     create: false,
@@ -142,7 +166,7 @@ const initialState: MessageTemplatesState = {
     fetch: false,
     upload: false,
   },
-  
+
   error: {
     list: null,
     create: null,
@@ -154,7 +178,7 @@ const initialState: MessageTemplatesState = {
 };
 
 const messageTemplatesSlice = createSlice({
-  name: 'messageTemplates',
+  name: "messageTemplates",
   initialState,
   reducers: {
     // Clear errors
@@ -168,44 +192,47 @@ const messageTemplatesSlice = createSlice({
         upload: null,
       };
     },
-    
+
     // Clear specific error
-    clearError: (state, action: PayloadAction<keyof MessageTemplatesState['error']>) => {
+    clearError: (
+      state,
+      action: PayloadAction<keyof MessageTemplatesState["error"]>
+    ) => {
       state.error[action.payload] = null;
     },
-    
+
     // Set filters
-    setSearch: (state, action: PayloadAction<string>) => {
-      state.filters.search = action.payload;
-      state.pagination.page = 1; // Reset to first page when searching
-    },
-    
-    setTypeFilter: (state, action: PayloadAction<'Text' | 'Text & Image' | 'all'>) => {
-      state.filters.type = action.payload;
-      state.pagination.page = 1; // Reset to first page when filtering
-    },
-    
+    // setSearch: (state, action: PayloadAction<string>) => {
+    //   state.filters.search = action.payload;
+    //   state.pagination.page = 1; // Reset to first page when searching
+    // },
+
+    // setTypeFilter: (state, action: PayloadAction<'Text' | 'Text & Image' | 'all'>) => {
+    //   state.filters.type = action.payload;
+    //   state.pagination.page = 1; // Reset to first page when filtering
+    // },
+
     // Set pagination
     setPage: (state, action: PayloadAction<number>) => {
       state.pagination.page = action.payload;
     },
-    
+
     setLimit: (state, action: PayloadAction<number>) => {
       state.pagination.limit = action.payload;
       state.pagination.page = 1; // Reset to first page when changing limit
     },
-    
+
     // Select template
     selectTemplate: (state, action: PayloadAction<MessageTemplate | null>) => {
       state.selectedTemplate = action.payload;
     },
-    
+
     // Clear selected template
     clearSelectedTemplate: (state) => {
       state.selectedTemplate = null;
     },
   },
-  
+
   extraReducers: (builder) => {
     // Fetch templates
     builder
@@ -227,7 +254,7 @@ const messageTemplatesSlice = createSlice({
         state.loading.list = false;
         state.error.list = action.payload as string;
       });
-    
+
     // Fetch single template
     builder
       .addCase(fetchMessageTemplateById.pending, (state) => {
@@ -242,7 +269,7 @@ const messageTemplatesSlice = createSlice({
         state.loading.fetch = false;
         state.error.fetch = action.payload as string;
       });
-    
+
     // Create template
     builder
       .addCase(createMessageTemplate.pending, (state) => {
@@ -258,7 +285,7 @@ const messageTemplatesSlice = createSlice({
         state.loading.create = false;
         state.error.create = action.payload as string;
       });
-    
+
     // Update template
     builder
       .addCase(updateMessageTemplate.pending, (state) => {
@@ -268,7 +295,9 @@ const messageTemplatesSlice = createSlice({
       .addCase(updateMessageTemplate.fulfilled, (state, action) => {
         state.loading.update = false;
         const updatedTemplate = action.payload;
-        const index = state.templates.findIndex(template => template.id === updatedTemplate.id);
+        const index = state.templates.findIndex(
+          (template) => template.id === updatedTemplate.id
+        );
         if (index !== -1) {
           state.templates[index] = updatedTemplate;
         }
@@ -280,7 +309,7 @@ const messageTemplatesSlice = createSlice({
         state.loading.update = false;
         state.error.update = action.payload as string;
       });
-    
+
     // Delete template
     builder
       .addCase(deleteMessageTemplate.pending, (state) => {
@@ -290,7 +319,9 @@ const messageTemplatesSlice = createSlice({
       .addCase(deleteMessageTemplate.fulfilled, (state, action) => {
         state.loading.delete = false;
         const deletedId = action.payload;
-        state.templates = state.templates.filter(template => template.id !== deletedId);
+        state.templates = state.templates.filter(
+          (template) => template.id !== deletedId
+        );
         state.pagination.total -= 1;
         if (state.selectedTemplate?.id === deletedId) {
           state.selectedTemplate = null;
@@ -300,7 +331,7 @@ const messageTemplatesSlice = createSlice({
         state.loading.delete = false;
         state.error.delete = action.payload as string;
       });
-    
+
     // Upload image
     builder
       .addCase(uploadTemplateImage.pending, (state) => {
@@ -320,8 +351,8 @@ const messageTemplatesSlice = createSlice({
 export const {
   clearErrors,
   clearError,
-  setSearch,
-  setTypeFilter,
+  // setSearch,
+  // setTypeFilter,
   setPage,
   setLimit,
   selectTemplate,
@@ -331,9 +362,12 @@ export const {
 export default messageTemplatesSlice.reducer;
 
 // Selectors
-export const selectMessageTemplates = (state: any) => state.messageTemplates.templates;
-export const selectSelectedTemplate = (state: any) => state.messageTemplates.selectedTemplate;
-export const selectPagination = (state: any) => state.messageTemplates.pagination;
+export const selectMessageTemplates = (state: any) =>
+  state.messageTemplates.templates;
+export const selectSelectedTemplate = (state: any) =>
+  state.messageTemplates.selectedTemplate;
+export const selectPagination = (state: any) =>
+  state.messageTemplates.pagination;
 export const selectFilters = (state: any) => state.messageTemplates.filters;
 export const selectLoading = (state: any) => state.messageTemplates.loading;
 export const selectErrors = (state: any) => state.messageTemplates.error;

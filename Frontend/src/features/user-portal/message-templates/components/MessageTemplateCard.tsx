@@ -50,7 +50,7 @@ const MessageTemplateCard: React.FC<MessageTemplateCardProps> = ({ template, can
             </>
           )}
         </div>
-      </div>
+      </div> 
       
       <div className="template-content">
         <h3>{template.name}</h3>

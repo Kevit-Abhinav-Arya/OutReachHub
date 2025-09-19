@@ -8,6 +8,8 @@ const apiClient = axios.create({
     "Content-Type": "application/json",
   },
 });
+const isAuthRoute =
+  location.pathname === "/login" || location.pathname === "/select-workspace";
 
 // Request interceptor for auth token
 apiClient.interceptors.request.use(
@@ -22,11 +24,16 @@ apiClient.interceptors.request.use(
 );
 
 // Response interceptor for error handling
+
 apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
+    if (!isAuthRoute) {
+    }
     if (error.response?.status === 401) {
-      alert("Session expired or unauthorized. Please log in again.");
+      if (!isAuthRoute) {
+        alert("Session expired or unauthorized. Please log in again.");
+      }
 
       // Clear token from localStorage
       localStorage.removeItem("authToken");

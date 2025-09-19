@@ -1,6 +1,8 @@
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { useAppSelector } from './hooks/redux';
 import { selectIsLoading } from './features/auth/slices/authSlice';
+import { ToastContainer } from 'react-toastify';
+
 
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { RoleBasedRoute } from './components/RoleBasedRoute';
@@ -44,6 +46,7 @@ function App() {
 
   return (
     <Router>
+      <ToastContainer/>
       <Layout>
         <Routes>
           {/* Public routes */}

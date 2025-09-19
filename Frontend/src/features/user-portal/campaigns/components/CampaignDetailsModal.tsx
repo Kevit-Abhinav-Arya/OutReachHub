@@ -127,9 +127,11 @@ const CampaignDetailsModal: React.FC<CampaignDetailsModalProps> = ({ campaign, o
                     {campaign.template?.body && (
                       <div className="info-item template-content-item">
                         <span className="info-label">Template Content:</span>
-                        <div className="template-content">
-                          {campaign.template.body}
-                        </div>
+                          <div className="form-group"><textarea 
+                value={campaign.template?.body}
+                disabled
+              /></div>
+                        
                       </div>
                     )}
                     {campaign.createdBy && (

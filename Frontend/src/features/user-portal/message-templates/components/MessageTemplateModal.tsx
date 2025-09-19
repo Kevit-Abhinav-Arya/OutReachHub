@@ -50,7 +50,11 @@ const MessageTemplateModal: React.FC<MessageTemplateModalProps> = ({
             </div>
             <div className="detail-row">
               <label>Content:</label>
-              <div className="template-content-preview">{template?.body}</div>
+              <div className="form-group"><textarea 
+                value={template?.body}
+                rows={mode === 'view' ? 6 : 8}
+                disabled
+              /></div>
             </div>
             {template?.imageUrl && (
               <div className="detail-row">
@@ -113,8 +117,12 @@ const MessageTemplateModal: React.FC<MessageTemplateModalProps> = ({
                 value={formData.name}
                 onChange={(e) => onFormChange('name', e.target.value)}
                 placeholder="Enter template name..." 
+                maxLength={25}
                 required
               />
+             <div className="form-help">
+                <small>Max length of the name should be 25 characters</small>
+              </div>
             </div>
 
             <div className="form-group">

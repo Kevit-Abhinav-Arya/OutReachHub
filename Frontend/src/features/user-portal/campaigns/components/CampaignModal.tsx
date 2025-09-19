@@ -108,9 +108,7 @@ const CampaignModal: React.FC<CampaignModalProps> = ({ type, campaign, onClose }
 
   const getSelectedTemplate = () => {
     const template = messageTemplates.find((t: any) => t.id === formData.templateId);
-    if (template) {
-      console.log('Selected template:', template); // Debug log
-    }
+   
     return template;
   };
 
@@ -142,10 +140,14 @@ const CampaignModal: React.FC<CampaignModalProps> = ({ type, campaign, onClose }
                 name="name"
                 value={formData.name}
                 onChange={handleInputChange}
+                maxLength={25}
                 className={errors.name ? 'error' : ''}
                 placeholder="Enter campaign name"
               />
               {errors.name && <span className="error-message">{errors.name}</span>}
+               <div className="form-help">
+                <small>Max length of the name should be 25 characters</small>
+              </div>
             </div>
           </div>
 

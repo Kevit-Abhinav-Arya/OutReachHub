@@ -6,7 +6,6 @@ import './Contacts.scss';
 import type { ContactDisplay, CreateContactDto, UpdateContactDto } from '../types/contact.types';
 import { 
   fetchContacts, 
-  setSearch, 
   setPage, 
   clearErrors,
   createContact,
@@ -24,7 +23,6 @@ const Contacts: React.FC = () => {
   const { 
     contacts, 
     pagination, 
-    filters, 
     loading, 
     error 
   } = useSelector((state: RootState) => state.contacts);
@@ -36,15 +34,30 @@ const Contacts: React.FC = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [selectedContact, setSelectedContact] = useState<ContactDisplay | null>(null);
   const [modalType, setModalType] = useState<'view' | 'edit' | 'delete' | null>(null);
-
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  
+ // Debounce search term
   useEffect(() => {
-    const query = {
-      page: pagination.page,
-      limit: pagination.limit,
-      search: filters.search || undefined,
-    };
-    dispatch(fetchContacts(query));
-  }, [dispatch, pagination.page, pagination.limit, filters.search]);
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+      if (searchTerm !== debouncedSearchTerm) {
+        pagination.page
+      }
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm, debouncedSearchTerm]);
+  
+    useEffect(() => {
+      dispatch(fetchContacts({ 
+        page: pagination.page, 
+        limit: 10,
+        search: debouncedSearchTerm || undefined 
+      }));
+    }, [dispatch, pagination.page, debouncedSearchTerm]);
+
+
 
   const handleContactAction = (contact: ContactDisplay, action: 'view' | 'edit' | 'delete') => {
     if (!canEdit && (action === 'edit' || action === 'delete')) {
@@ -87,9 +100,7 @@ const Contacts: React.FC = () => {
     }
   };
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    dispatch(setSearch(e.target.value));
-  };
+
 
   const handlePageChange = (page: number) => {
     dispatch(setPage(page));
@@ -129,8 +140,8 @@ const Contacts: React.FC = () => {
           <input 
             type="text" 
             placeholder="Search contacts... by name or phone number" 
-            value={filters.search}
-            onChange={handleSearchChange}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
       </div>

@@ -14,15 +14,7 @@ interface CampaignCardProps {
 }
 
 const CampaignCard: React.FC<CampaignCardProps> = ({ campaign, canEdit, onAction, progress }) => {
-  // Debug log for campaign template data
-  console.log('Campaign template data:', {
-    templateId: campaign.templateId,
-    template: campaign.template,
-    hasTemplate: !!campaign.template,
-    templateType: campaign.template?.type,
-    hasImageUrl: !!campaign.template?.imageUrl,
-    imageUrl: campaign.template?.imageUrl
-  });
+
  
 
   const getStatusIcon = (status: Campaign['status']) => {
@@ -149,7 +141,6 @@ const CampaignCard: React.FC<CampaignCardProps> = ({ campaign, canEdit, onAction
                 <img 
                   src={campaign.template.imageUrl} 
                   alt="Template" 
-                  onLoad={() => console.log('Image loaded successfully:', campaign.template?.imageUrl)}
                   onError={(e) => console.error('Image failed to load:', campaign.template?.imageUrl, e)}
                 />
               </div>
@@ -157,26 +148,9 @@ const CampaignCard: React.FC<CampaignCardProps> = ({ campaign, canEdit, onAction
           </div>
         )}
 
-        {campaign.template?.body && (
-          <div className="detail-row">
-            <div className="detail-item template-content">
-              <i className="fas fa-comment-alt"></i>
-              <span className="detail-label">Template Content:</span>
-              <div className="template-body">
-                {campaign.template.body}
-              </div>
-            </div>
-          </div>
-        )}
+     
 
-        {(() => {
-          console.log('Image render conditions:', {
-            hasImageUrl: !!campaign.template?.imageUrl,
-            isTextAndImage: campaign.template?.type === 'Text & Image',
-            shouldRender: campaign.template?.imageUrl && campaign.template.type === 'Text & Image'
-          });
-          return null;
-        })()}
+       
       </div>
 
       {showProgress && (
