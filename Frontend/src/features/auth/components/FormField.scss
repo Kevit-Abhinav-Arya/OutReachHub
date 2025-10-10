@@ -1,0 +1,119 @@
+@use "@/styles/variables.scss" as *;
+@use "@/styles/mixins.scss" as *;
+
+.form-field {
+  margin-bottom: 1.5rem;
+
+  &__label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: $primary-cyan;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 1px 3px rgba(100, 255, 218, 0.2);
+
+    .form-field__required {
+      color: #ff6b6b;
+      margin-left: 0.25rem;
+    }
+  }
+
+  &__input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  &__icon {
+    position: absolute;
+    left: 1rem;
+    z-index: 2;
+    color: rgba(100, 255, 218, 0.6);
+    font-size: 1.1rem;
+    pointer-events: none;
+    transition: all 0.3s ease;
+  }
+
+  &__input {
+    width: 100%;
+    padding: 1rem 1.25rem;
+    border: 2px solid rgba(100, 255, 218, 0.2);
+    border-radius: 15px;
+    background: rgba(100, 255, 218, 0.05);
+    backdrop-filter: blur(10px);
+    font-size: 1rem;
+    color: #e7e0e0;
+    transition: all 0.3s ease;
+    font-weight: 500;
+
+    &::placeholder {
+      color: rgba(231, 224, 224, 0.5);
+    }
+
+    &:focus {
+      outline: none;
+      border-color: $primary-cyan;
+      background: rgba(100, 255, 218, 0.08);
+      box-shadow: 0 0 0 4px rgba(100, 255, 218, 0.1);
+      color: #ffffff;
+      transform: translateY(-1px);
+
+      ~ .form-field__icon {
+        color: $primary-cyan;
+        transform: scale(1.1);
+      }
+    }
+
+    &:disabled {
+      background: rgba(231, 224, 224, 0.05);
+      color: rgba(231, 224, 224, 0.4);
+      cursor: not-allowed;
+      border-color: rgba(100, 255, 218, 0.1);
+    }
+
+    &--with-icon {
+      padding-left: 3rem;
+    }
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .form-field {
+    margin-bottom: 1.25rem;
+
+    &__input {
+      padding: 0.9rem 1rem;
+      font-size: 1rem;
+
+      &--with-icon {
+        padding-left: 2.75rem;
+      }
+    }
+
+    &__icon {
+      left: 0.9rem;
+      font-size: 1rem;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .form-field {
+    margin-bottom: 1rem;
+
+    &__input {
+      padding: 0.85rem 0.9rem;
+      font-size: 16px; // Prevent zoom on iOS
+
+      &--with-icon {
+        padding-left: 2.5rem;
+      }
+    }
+
+    &__icon {
+      left: 0.8rem;
+      font-size: 0.9rem;
+    }
+  }
+}

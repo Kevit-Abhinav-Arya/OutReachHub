@@ -1,0 +1,249 @@
+@use "@/styles/variables.scss" as *;
+@use "@/styles/mixins.scss" as *;
+
+.workspace-selection-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  position: relative;
+}
+
+.workspace-selection-card {
+  width: 100%;
+  max-width: 600px;
+  padding: 3rem 2.5rem;
+  background: linear-gradient(
+    135deg,
+    rgba(12, 12, 13, 0.95) 0%,
+    rgba(26, 74, 94, 0.9) 100%
+  );
+  backdrop-filter: blur(20px);
+  border-radius: 25px;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4),
+    inset 0 0 60px rgba(100, 255, 218, 0.05);
+  border: 1px solid rgba(100, 255, 218, 0.1);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+
+  .header {
+    margin-bottom: 2.5rem;
+    position: relative;
+    z-index: 1;
+
+    h1 {
+      font-size: 2.5rem;
+      color: $primary-cyan;
+      margin-bottom: 0.5rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+      text-shadow: 0 2px 10px rgba(100, 255, 218, 0.3);
+      @include gradient-text($primary-cyan, $secondary-blue);
+    }
+
+    p {
+      color: $text-secondary;
+      font-size: 1rem;
+      line-height: 1.5;
+      margin-bottom: 1rem;
+    }
+  }
+
+  .workspaces-list {
+    margin-bottom: 2rem;
+    position: relative;
+    z-index: 1;
+
+    .workspace-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      background: rgba(100, 255, 218, 0.05);
+      border: 2px solid rgba(100, 255, 218, 0.1);
+      border-radius: 15px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+
+      &:hover {
+        background: rgba(100, 255, 218, 0.08);
+        border-color: rgba(100, 255, 218, 0.2);
+        transform: translateY(-2px);
+      }
+
+      &.selected {
+        background: rgba(100, 255, 218, 0.15);
+        border-color: $primary-cyan;
+        box-shadow: 0 4px 20px rgba(100, 255, 218, 0.2);
+        transform: translateY(-2px);
+
+        .workspace-info h3 {
+          color: $primary-cyan;
+        }
+
+        .check-icon {
+          color: $primary-cyan;
+          font-size: 1.2rem;
+          font-weight: bold;
+        }
+      }
+
+      .workspace-info {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        text-align: left;
+
+        h3 {
+          color: $text-primary;
+          font-size: 1.2rem;
+          font-weight: 600;
+          margin-bottom: 0.5rem;
+          transition: color 0.3s ease;
+        }
+
+        .role-badge {
+          padding: 0.25rem 0.75rem;
+          border-radius: 20px;
+          font-size: 0.8rem;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+
+          &.editor {
+            background: rgba(100, 255, 218, 0.2);
+            color: $primary-cyan;
+            border: 1px solid rgba(100, 255, 218, 0.3);
+          }
+
+          &.viewer {
+            background: rgba(127, 219, 255, 0.2);
+            color: $secondary-blue;
+            border: 1px solid rgba(127, 219, 255, 0.3);
+          }
+        }
+      }
+      .workspace-icon {
+        font-size: 1.5rem;
+        color: rgba(231, 224, 224, 0.5);
+        transition: all 0.3s ease;
+
+        .arrow-icon {
+          font-weight: bold;
+        }
+
+        .check-icon {
+          color: $primary-cyan;
+          font-weight: bold;
+        }
+      }
+    }
+  }
+
+  .actions {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    position: relative;
+    z-index: 1;
+
+    .btn-primary {
+      flex: 1;
+      padding: 1rem 2rem;
+      border-radius: 15px;
+      border: none;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      letter-spacing: 0.5px;
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+      }
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, $primary-cyan 0%, $accent-blue 100%);
+      color: #0c0c0d;
+
+      &:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(100, 255, 218, 0.4);
+      }
+
+      &:disabled {
+        background: rgba(231, 224, 224, 0.2);
+        color: rgba(231, 224, 224, 0.5);
+      }
+    }
+  }
+
+  .session-info {
+    position: relative;
+    z-index: 1;
+
+    p {
+      color: rgba(231, 224, 224, 0.6);
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+
+      .info-icon {
+        font-size: 1rem;
+      }
+    }
+  }
+
+  .loading {
+    color: rgba(231, 224, 224, 0.7);
+    font-size: 1rem;
+    padding: 2rem;
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .workspace-selection-card {
+    max-width: 500px;
+    padding: 2.5rem 2rem;
+    margin: 1rem;
+
+    .header h1 {
+      font-size: 2rem;
+    }
+
+    .actions {
+      flex-direction: column;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .workspace-selection-card {
+    padding: 2rem 1.5rem;
+    margin: 0.5rem;
+    max-width: 400px;
+
+    .header h1 {
+      font-size: 1.8rem;
+    }
+
+    .workspaces-list .workspace-item {
+      padding: 1.25rem;
+
+      .workspace-info h3 {
+        font-size: 1.1rem;
+      }
+    }
+  }
+}

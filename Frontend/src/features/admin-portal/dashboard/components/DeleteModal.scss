@@ -1,0 +1,138 @@
+.delete-modal {
+  background: rgba(35, 34, 50, 0.2);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(220, 53, 69, 0.3);
+  border-radius: 15px;
+  width: 90%;
+  max-width: 450px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  animation: slideInUp 0.3s ease-out;
+
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid rgba(220, 53, 69, 0.2);
+
+    h2 {
+      color: #dc3545;
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      color: rgba(231, 224, 224, 0.6);
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+
+      &:hover {
+        color: #dc3545;
+      }
+    }
+  }
+
+  .modal-body {
+    padding: 1.5rem;
+    text-align: center;
+
+    .warning-icon {
+      font-size: 4rem;
+      color: #dc3545;
+      margin-bottom: 1rem;
+      animation: pulse 2s infinite;
+    }
+
+    p {
+      color: #e7e0e0;
+      margin-bottom: 0.5rem;
+      font-size: 1rem;
+    }
+
+    .user-name,
+    .workspace-name {
+      color: #64ffda;
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin: 1rem 0;
+    }
+
+    .warning-text {
+      color: rgba(220, 53, 69, 0.8);
+      font-size: 0.9rem;
+      font-style: italic;
+    }
+  }
+
+  .modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    padding: 1.5rem;
+    border-top: 1px solid rgba(231, 224, 224, 0.1);
+
+    .delete-btn {
+      padding: 0.8rem 1.5rem;
+      background: #ff4444;
+      border: none;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 600;
+      font-size: 1rem;
+
+      &:hover {
+        background: #ff6666;
+      }
+    }
+
+    .cancel-btn {
+      padding: 0.8rem 1.5rem;
+      background: rgba(35, 34, 50, 0.4);
+      border: 1px solid rgba(231, 224, 224, 0.1);
+      color: #e7e0e0;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 1rem;
+
+      &:hover {
+        background: rgba(35, 34, 50, 0.6);
+      }
+    }
+  }
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.7;
+    transform: scale(0.95);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 0.7;
+    transform: scale(0.95);
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
