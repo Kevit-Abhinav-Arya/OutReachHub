@@ -1,4 +1,5 @@
 import apiClient from "../client";
+
 import type {
   LoginCredentials,
   AdminLoginResponse,
@@ -8,11 +9,13 @@ import type {
   VerifyTokenResponse,
 } from "@/features/auth/types/auth.types";
 
+
 export const authApi = {
   // Admin login
   adminLogin: async (
     credentials: LoginCredentials
   ): Promise<AdminLoginResponse> => {
+
     const response = await apiClient.post("/auth/admin/login", credentials);
     return response.data;
   },
